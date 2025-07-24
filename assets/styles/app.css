@@ -97,6 +97,7 @@ body {
   color: var(--text-light);
   font-size: 16px;
   transition: all 0.3s;
+  margin-bottom: 8px;
 }
 
 .form-control:focus {
@@ -106,10 +107,10 @@ body {
 }
 
 .form-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: var(--text-light);
+  display: block !important;
+  margin-bottom: 8px !important;
+  font-weight: 500 !important;
+  color: var(--text-light) !important;
 }
 
 /* Login & Register Pages */
@@ -245,4 +246,21 @@ body {
   color: var(--primary-green);
   text-decoration: none;
   font-weight: 500;
+}
+
+.flash-error {
+  background: rgba(255, 62, 95, 0.1);
+  border: 1px solid var(--primary-red);
+  color: var(--primary-red);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  box-shadow: var(--shadow-neon-red);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }

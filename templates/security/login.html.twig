@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+{% block title %}Connexion
+{% endblock %}
+
+{% block body %}
+	<div id="login-page" class="container active">
+		<div class="auth-container">
+			<div class="auth-illustration">
+				<i class="fas fa-robot" style="font-size: 120px; color: rgba(255,255,255,0.1); z-index: 1;"></i>
+				<div style="position: absolute; z-index: 2; text-align: center;">
+					<h2 style="font-size: 32px; margin-bottom: 20px; background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%); -webkit-background-clip: text; background-clip: text; color: transparent;">INNOMIATE</h2>
+					<p style="color: var(--text-dim); max-width: 400px;">Le hub principal des compétitions IA et de la collaboration</p>
+				</div>
+			</div>
+			<div class="auth-form-container">
+				<div class="auth-form">
+					<div class="logo">
+						<span class="logo-icon">
+							<i class="fas fa-robot"></i>
+						</span>
+						<span class="logo-text">INNOMIATE</span>
+					</div>
+
+					{% for message in app.flashes('error') %}
+						<div class="flash-error">
+							{{ message }}
+						</div>
+					{% endfor %}
+
+					<h1 class="auth-title">Bon retour !</h1>
+					<p class="auth-subtitle">Connectez-vous pour accéder à vos compétitions et équipes</p>
+
+					{% if error %}
+						<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+					{% endif %}
+
+					<form method="post" id="login-form">
+						<div class="form-group">
+							<label for="username" class="form-label">E-mail</label>
+							<input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" placeholder="Entrez votre e-mail" required autofocus>
+						</div>
+						<div class="form-group">
+							<label for="password" class="form-label">Mot de passe</label>
+							<input type="password" name="_password" id="password" class="form-control" placeholder="Entrez votre mot de passe" required>
+						</div>
+						<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+						<button type="submit" class="btn btn-green" style="width: 100%;">Connexion</button>
+					</form>
+
+					<div class="auth-footer">
+						Vous n'avez pas de compte ?
+						<a href="{{ path('app_register') }}" class="auth-link">Inscrivez-vous</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
