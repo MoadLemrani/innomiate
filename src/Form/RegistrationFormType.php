@@ -67,7 +67,7 @@ class RegistrationFormType extends AbstractType
                     'label' => 'Confirmer le mot de passe',
                     'attr' => ['autocomplete' => 'new-password'],
                 ],
-                'invalid_message' => 'Les mots de passe ne correspondent pas.',
+                'invalid_message' => 'Les mots de passe ne correspondent pas',
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Veuillez saisir un mot de passe',

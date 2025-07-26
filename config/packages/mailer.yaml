@@ -1,3 +1,3 @@
 framework:
     mailer:
-        dsn: '%env(MAILER_DSN)%'
+        dsn: 'smtp://adriana.beahan53@ethereal.email:uzZ3NUry3ZUtrjT1fb@smtp.ethereal.email:587?encryption=tls'

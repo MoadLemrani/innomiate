@@ -1,11 +1,24 @@
-<h1>Hi! Please confirm your email!</h1>
+<h2 style="font-family: Arial, sans-serif; color: #2c3e50;">Bienvenue sur notre plateforme !</h2>
 
-<p>
-    Please confirm your email address by clicking the following link: <br><br>
-    <a href="{{ signedUrl|raw }}">Confirm my Email</a>.
-    This link will expire in {{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}.
+<p style="font-family: Arial, sans-serif; color: #34495e; font-size: 16px;">
+    Bonjour {{ user.firstname|default('utilisateur') }},
 </p>
 
-<p>
-    Cheers!
+<p style="font-family: Arial, sans-serif; color: #34495e; font-size: 16px;">
+    Merci de vous être inscrit(e) sur notre site. Pour activer votre compte, veuillez confirmer votre adresse email en cliquant sur le lien ci-dessous :
+</p>
+
+<p style="text-align: center; margin: 20px 0;">
+    <a href="{{ signedUrl|raw }}"
+       style="background-color: #1abc9c; color: white; padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+        Confirmer mon adresse email
+    </a>
+</p>
+
+<p style="font-family: Arial, sans-serif; color: #7f8c8d; font-size: 14px;">
+    Ce lien expirera dans {{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}.
+</p>
+
+<p style="font-family: Arial, sans-serif; color: #34495e; font-size: 16px;">
+    Cordialement,<br>L’équipe Support
 </p>

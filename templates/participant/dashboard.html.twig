@@ -1,0 +1,841 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Dashboard - Tableau de Bord
+{% endblock %}
+
+{% block body %}
+	<style>
+		/* =================================
+		   CSS VARIABLES & ROOT SETTINGS
+		   ================================= */
+		:root {
+			--primary-red: #ff3e5f;
+			--primary-green: #2ecc71;
+			--primary-blue: #667eea;
+			--primary-purple: #764ba2;
+			--primary-white: #ffffff;
+			--dark-bg: #0f1621;
+			--glass-bg: rgba(255, 255, 255, 0.05);
+			--text-light: #f0f0f0;
+			--text-dim: #b0b0b0;
+			--shadow-neon-red: 0 0 10px rgba(255, 62, 95, 0.3);
+			--shadow-neon-green: 0 0 10px rgba(46, 204, 113, 0.3);
+			--shadow-neon-blue: 0 0 10px rgba(102, 126, 234, 0.3);
+			--shadow-color: rgba(0, 0, 0, 0.3);
+			--card-background: rgba(255, 255, 255, 0.1);
+			--transition: all 0.3s ease;
+		}
+
+		:root[data-theme="light"] {
+			--primary-red: #e74c3c;
+			--primary-green: #27ae60;
+			--primary-blue: #3498db;
+			--primary-purple: #9b59b6;
+			--primary-white: #000000;
+			--dark-bg: #f8f9fa;
+			--glass-bg: rgba(255, 255, 255, 0.9);
+			--text-light: #2c3e50;
+			--text-dim: #6c757d;
+			--shadow-neon-red: 0 0 10px rgba(231, 76, 60, 0.2);
+			--shadow-neon-green: 0 0 10px rgba(39, 174, 96, 0.2);
+			--shadow-neon-blue: 0 0 10px rgba(52, 152, 219, 0.2);
+			--shadow-color: rgba(0, 0, 0, 0.1);
+			--card-background: rgba(255, 255, 255, 0.95);
+		}
+
+		/* =================================
+		   GLOBAL STYLES
+		   ================================= */
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			background: var(--dark-bg);
+			color: var(--text-light);
+			min-height: 100vh;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			transition: var(--transition);
+		}
+
+		/* =================================
+		   ANIMATIONS & KEYFRAMES
+		   ================================= */
+		@keyframes pulse {
+			0% {
+				transform: scale(0.8);
+				opacity: 0.5;
+			}
+			100% {
+				transform: scale(1.2);
+				opacity: 0.8;
+			}
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translateY(-5px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		@keyframes slideInDown {
+			from { transform: translateY(-100px); opacity: 0; }
+			to { transform: translateY(0); opacity: 1; }
+		}
+
+		@keyframes slideInRight {
+			from { transform: translateX(100px); opacity: 0; }
+			to { transform: translateX(0); opacity: 1; }
+		}
+
+		@keyframes fadeInUp {
+			from { transform: translateY(50px); opacity: 0; }
+			to { transform: translateY(0); opacity: 1; }
+		}
+
+		/* =================================
+		   THEME TOGGLE COMPONENT
+		   ================================= */
+		.theme-toggle {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			z-index: 999;
+			background: var(--card-background);
+			border: 2px solid var(--text-light);
+			border-radius: 50px;
+			padding: 10px;
+			cursor: pointer;
+			box-shadow: 0 4px 15px var(--shadow-color);
+			transition: var(--transition);
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.theme-toggle:hover {
+			transform: scale(1.05);
+			box-shadow: 0 6px 20px var(--shadow-color);
+		}
+
+		.theme-toggle .sun-icon,
+		.theme-toggle .moon-icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.theme-toggle svg {
+			width: 24px;
+			height: 24px;
+			display: block;
+			color: currentColor;
+			transition: var(--transition);
+		}
+
+		.theme-toggle .sun-icon svg {
+			color: #ffa500;
+		}
+
+		.theme-toggle .moon-icon svg {
+			color: #4cc9f0;
+		}
+
+		/* =================================
+		   DASHBOARD LAYOUT
+		   ================================= */
+		.dashboard-container {
+			display: flex;
+			min-height: 100vh;
+		}
+
+		/* Sidebar */
+		.sidebar {
+			width: 250px;
+			background: rgba(15, 22, 33, 0.8);
+			backdrop-filter: blur(10px);
+			padding: 30px 20px;
+			border-right: 1px solid rgba(255, 255, 255, 0.1);
+		}
+
+		.sidebar-header {
+			display: flex;
+			align-items: center;
+			margin-bottom: 30px;
+		}
+
+		.sidebar-logo {
+			font-size: 24px;
+			margin-right: 10px;
+			background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
+			-webkit-background-clip: text;
+			background-clip: text;
+			color: transparent;
+		}
+
+		.sidebar-title {
+			font-size: 20px;
+			font-weight: 700;
+		}
+
+		.nav-menu {
+			list-style: none;
+		}
+
+		.nav-item {
+			margin-bottom: 10px;
+		}
+
+		.nav-link {
+			display: flex;
+			align-items: center;
+			padding: 12px 15px;
+			color: var(--text-dim);
+			text-decoration: none;
+			border-radius: 6px;
+			transition: all 0.3s;
+		}
+
+		.nav-link:hover, .nav-link.active {
+			background: rgba(255, 255, 255, 0.1);
+			color: var(--text-light);
+		}
+
+		.nav-link.active {
+			border-left: 3px solid var(--primary-green);
+		}
+
+		.nav-icon {
+			margin-right: 10px;
+			font-size: 18px;
+		}
+
+		/* Main Content */
+		.main-content {
+			flex: 1;
+			padding: 30px;
+			background: rgba(15, 22, 33, 0.5);
+		}
+
+		.page-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 30px;
+		}
+
+		.page-title {
+			font-size: 24px;
+			font-weight: 600;
+		}
+
+		.user-profile {
+			display: flex;
+			align-items: center;
+		}
+
+		.user-avatar {
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-right: 10px;
+			color: white;
+			font-weight: 600;
+		}
+
+		.user-name {
+			font-weight: 500;
+		}
+
+		/* Glass Card Base */
+		.glass-card {
+			background: var(--card-background);
+			backdrop-filter: blur(10px);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 20px;
+			box-shadow: 0 8px 32px var(--shadow-color);
+			transition: var(--transition);
+		}
+
+		/* =================================
+		   FLASH MESSAGES - MATCHING LOGIN PAGE STYLE
+		   ================================= */
+		.flash-messages {
+			margin-bottom: 30px;
+		}
+
+		/* Base flash message styles */
+		.flash-info, .flash-success, .flash-error, .flash-warning {
+			padding: 12px 16px;
+			margin-bottom: 20px;
+			border-radius: 6px;
+			font-size: 14px;
+			animation: fadeIn 0.3s ease-in-out;
+			text-align: center;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			border: 1px solid;
+		}
+
+		/* Info messages (blue) */
+		.flash-info {
+			background: rgba(52, 152, 219, 0.1);
+			border-color: var(--primary-blue);
+			color: var(--primary-blue);
+			box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+		}
+
+		/* Success messages (green) */
+		.flash-success {
+			background: rgba(46, 204, 113, 0.1);
+			border-color: var(--primary-green);
+			color: var(--primary-green);
+			box-shadow: var(--shadow-neon-green);
+		}
+
+		/* Error messages (red) */
+		.flash-error {
+			background: rgba(255, 62, 95, 0.1);
+			border-color: var(--primary-red);
+			color: var(--primary-red);
+			box-shadow: var(--shadow-neon-red);
+		}
+
+		/* Warning messages (orange/yellow) */
+		.flash-warning {
+			background: rgba(255, 193, 7, 0.1);
+			border-color: #ffc107;
+			color: #ffc107;
+			box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+		}
+
+		/* Light theme adjustments */
+		:root[data-theme="light"] .flash-info {
+			background: rgba(52, 152, 219, 0.1);
+			border-color: var(--primary-blue);
+		}
+
+		:root[data-theme="light"] .flash-success {
+			background: rgba(39, 174, 96, 0.1);
+			border-color: var(--primary-green);
+		}
+
+		:root[data-theme="light"] .flash-error {
+			background: rgba(231, 76, 60, 0.1);
+			border-color: var(--primary-red);
+		}
+
+		:root[data-theme="light"] .flash-warning {
+			background: rgba(255, 193, 7, 0.1);
+			border-color: #e0a800;
+		}
+
+		/* Close button styling */
+		.flash-close {
+			background: none;
+			border: none;
+			color: currentColor;
+			opacity: 0.7;
+			cursor: pointer;
+			font-size: 16px;
+			margin-left: auto;
+			padding: 0;
+			width: 20px;
+			height: 20px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.flash-close:hover {
+			opacity: 1;
+		}
+
+		/* =================================
+		   VERIFICATION BANNER
+		   ================================= */
+		.verification-banner {
+			background: linear-gradient(45deg, var(--primary-red) 0%, #ff8f00 100%);
+			color: white;
+			padding: 1rem 1.5rem;
+			border-radius: 15px;
+			margin-bottom: 2rem;
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			animation: pulse 2s infinite;
+			box-shadow: var(--shadow-neon-red);
+		}
+
+		.verification-banner .icon {
+			font-size: 1.5rem;
+		}
+
+		/* =================================
+		   WELCOME SECTION
+		   ================================= */
+		.welcome-card {
+			padding: 20px;
+			margin-bottom: 30px;
+		}
+
+		.welcome-card h2 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+		.welcome-card p {
+			color: var(--text-dim);
+		}
+
+		/* =================================
+		   COMPETITION GRID
+		   ================================= */
+		.competition-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			gap: 20px;
+			margin-top: 20px;
+		}
+
+		.competition-card {
+			padding: 20px;
+			transition: transform 0.3s, box-shadow 0.3s;
+		}
+
+		.competition-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+		}
+
+		.competition-image {
+			width: 100%;
+			height: 160px;
+			object-fit: cover;
+			border-radius: 8px;
+			margin-bottom: 15px;
+			background: linear-gradient(135deg, rgba(255,62,95,0.3) 0%, rgba(46,204,113,0.3) 100%);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-size: 40px;
+		}
+
+		.competition-title {
+			font-size: 18px;
+			font-weight: 600;
+			margin-bottom: 10px;
+		}
+
+		.competition-desc {
+			color: var(--text-dim);
+			font-size: 14px;
+			margin-bottom: 15px;
+			line-height: 1.5;
+		}
+
+		.competition-actions {
+			display: flex;
+			gap: 10px;
+		}
+
+		/* =================================
+		   BUTTONS
+		   ================================= */
+		.btn {
+			padding: 8px 16px;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			font-size: 14px;
+			font-weight: 500;
+			text-decoration: none;
+			display: inline-block;
+			transition: var(--transition);
+		}
+
+		.btn-outline {
+			background: transparent;
+			border: 1px solid var(--text-dim);
+			color: var(--text-light);
+		}
+
+		.btn-outline:hover {
+			background: rgba(255, 255, 255, 0.1);
+		}
+
+		.btn-red {
+			background: linear-gradient(45deg, var(--primary-red) 0%, #ee5a52 100%);
+			color: white;
+		}
+
+		.btn-red:hover {
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-neon-red);
+		}
+
+		/* =================================
+		   RESPONSIVE DESIGN
+		   ================================= */
+		@media (max-width: 768px) {
+			.dashboard-container {
+				flex-direction: column;
+			}
+
+			.sidebar {
+				width: 100%;
+				padding: 20px;
+			}
+
+			.nav-menu {
+				display: flex;
+				overflow-x: auto;
+				gap: 10px;
+			}
+
+			.nav-item {
+				margin-bottom: 0;
+				white-space: nowrap;
+			}
+
+			.main-content {
+				padding: 20px;
+			}
+
+			.page-header {
+				flex-direction: column;
+				gap: 1rem;
+				text-align: center;
+			}
+
+			.competition-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+
+	<!-- Theme Toggle Button -->
+	<button id="darkModeToggle" class="theme-toggle">
+		<span class="sun-icon">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+				<path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z"/>
+			</svg>
+		</span>
+		<span class="moon-icon">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+				<path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z" clip-rule="evenodd"/>
+			</svg>
+		</span>
+	</button>
+
+	<!-- Dashboard -->
+	<div class="dashboard-container">
+		<!-- Sidebar -->
+		<div class="sidebar">
+			<div class="sidebar-header">
+				<span class="sidebar-logo">🤖</span>
+				<span class="sidebar-title">MIA Platform</span>
+			</div>
+			<ul class="nav-menu">
+				<li class="nav-item">
+					<a href="#" class="nav-link active">
+						<span class="nav-icon">🏠</span>
+						<span class="nav-text">Dashboard</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a href="#" class="nav-link">
+						<span class="nav-icon">👤</span>
+						<span class="nav-text">Profil</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a href="#" class="nav-link">
+						<span class="nav-icon">✉️</span>
+						<span class="nav-text">Invitations</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a href="#" class="nav-link">
+						<span class="nav-icon">🏆</span>
+						<span class="nav-text">Mes Compétitions</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a href="#" class="nav-link">
+						<span class="nav-icon">💡</span>
+						<span class="nav-text">Pitch Board</span>
+					</a>
+				</li>
+				<li class="nav-item" style="margin-top: 30px;">
+					<a href="{{ path('app_logout') }}" class="nav-link">
+						<span class="nav-icon">🚪</span>
+						<span class="nav-text">Déconnexion</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+		
+		<!-- Main Content -->
+		<div class="main-content">
+			{# Flash Messages #}
+			<div class="flash-messages">
+				{% for message in app.flashes('info') %}
+					<div class="flash-info">
+						<span class="icon">ℹ️</span>
+						{{ message }}
+						<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+					</div>
+				{% endfor %}
+
+				{% for message in app.flashes('success') %}
+					<div class="flash-success">
+						<span class="icon">✅</span>
+						{{ message }}
+						<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+					</div>
+				{% endfor %}
+
+				{% for message in app.flashes('error') %}
+					<div class="flash-error">
+						<span class="icon">❌</span>
+						{{ message }}
+						<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+					</div>
+				{% endfor %}
+
+				{% for message in app.flashes('warning') %}
+					<div class="flash-warning">
+						<span class="icon">⚠️</span>
+						{{ message }}
+						<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+					</div>
+				{% endfor %}
+			</div>
+
+			{# Email Verification Banner (show only if user is not verified) #}
+			{% if app.user and not app.user.isVerified %}
+				<div class="verification-banner">
+					<span class="icon">📧</span>
+					<div>
+						<strong>Veuillez vérifier votre adresse e-mail</strong><br>
+						Consultez votre boîte de réception et cliquez sur le lien de vérification pour débloquer toutes les fonctionnalités.
+					</div>
+				</div>
+			{% endif %}
+
+			<div class="page-header">
+				<h1 class="page-title">Dashboard</h1>
+				<div class="user-profile">
+					<div class="user-avatar">{{ app.user.email|first|upper }}</div>
+					<span class="user-name">{{ app.user.email|split('@')[0]|title }}</span>
+				</div>
+			</div>
+			
+			<div class="glass-card welcome-card">
+				<h2>Bon retour, {{ app.user.email|split('@')[0]|title }} !</h2>
+				<p>Vous avez 3 compétitions actives et 2 invitations en attente. Découvrez les dernières compétitions ci-dessous.</p>
+			</div>
+			
+			<h2 style="font-size: 20px; margin-bottom: 20px;">Compétitions Actuelles</h2>
+			
+			<div class="competition-grid">
+				<!-- Competition 1 -->
+				<div class="glass-card competition-card">
+					<div class="competition-image">
+						🧠
+					</div>
+					<h3 class="competition-title">Miathon 2023</h3>
+					<p class="competition-desc">Le hackathon IA de premier plan avec 50 000 $ de prix. Créez des solutions IA innovantes en 48 heures.</p>
+					<div class="competition-actions">
+						<button class="btn btn-outline">En savoir plus</button>
+						<button class="btn btn-red">S'inscrire</button>
+					</div>
+				</div>
+				
+				<!-- Competition 2 -->
+				<div class="glass-card competition-card">
+					<div class="competition-image">
+						📈
+					</div>
+					<h3 class="competition-title">Défi Trading IA</h3>
+					<p class="competition-desc">Développez un algorithme de trading IA et concourez pour les meilleurs rendements sur 3 mois.</p>
+					<div class="competition-actions">
+						<button class="btn btn-outline">En savoir plus</button>
+						<button class="btn btn-red">S'inscrire</button>
+					</div>
+				</div>
+				
+				<!-- Competition 3 -->
+				<div class="glass-card competition-card">
+					<div class="competition-image">
+						🗣️
+					</div>
+					<h3 class="competition-title">Coupe Innovation NLP</h3>
+					<p class="competition-desc">Repoussez les limites du traitement du langage naturel avec vos solutions innovantes.</p>
+					<div class="competition-actions">
+						<button class="btn btn-outline">En savoir plus</button>
+						<button class="btn btn-red">S'inscrire</button>
+					</div>
+				</div>
+				
+				<!-- Competition 4 -->
+				<div class="glass-card competition-card">
+					<div class="competition-image">
+						👁️
+					</div>
+					<h3 class="competition-title">Bataille Vision par Ordinateur</h3>
+					<p class="competition-desc">Résolvez des problèmes de vision par ordinateur du monde réel et montrez vos compétences.</p>
+					<div class="competition-actions">
+						<button class="btn btn-outline">En savoir plus</button>
+						<button class="btn btn-red">S'inscrire</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Dark Mode Toggle Functionality (same as login page)
+		const themeToggle = document.getElementById('darkModeToggle');
+		const sunIcon = themeToggle.querySelector('.sun-icon');
+		const moonIcon = themeToggle.querySelector('.moon-icon');
+
+		// Enhanced theme initialization for all pages
+		function initializeTheme() {
+			const savedTheme = localStorage.getItem('theme');
+			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			
+			// Prioritize saved theme, fallback to system preference
+			const defaultTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+			
+			// Apply theme immediately to prevent flash
+			document.documentElement.setAttribute('data-theme', defaultTheme);
+			
+			// Update toggle icons
+			updateToggleIcons(defaultTheme === 'dark');
+			
+			// Save the theme if it wasn't saved before
+			if (!savedTheme) {
+				localStorage.setItem('theme', defaultTheme);
+			}
+		}
+
+		function updateToggleIcons(isDark) {
+			// Show sun icon when in dark mode (to switch to light)
+			// Show moon icon when in light mode (to switch to dark)
+			sunIcon.style.display = isDark ? 'inline-block' : 'none';
+			moonIcon.style.display = isDark ? 'none' : 'inline-block';
+		}
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			localStorage.setItem('theme-manually-set', 'true');
+			updateToggleIcons(newTheme === 'dark');
+		}
+
+		// Initialize theme immediately
+		initializeTheme();
+
+		themeToggle.addEventListener('click', toggleTheme);
+		themeToggle.addEventListener('keydown', function (e) {
+			if (e.key === ' ' || e.key === 'Enter') {
+				e.preventDefault();
+				toggleTheme();
+			}
+		});
+
+		// Dashboard-specific functionality
+		document.addEventListener('DOMContentLoaded', function() {
+			// Auto-dismiss flash messages after 5 seconds
+			const flashMessages = document.querySelectorAll('.flash-info, .flash-success, .flash-error, .flash-warning');
+			flashMessages.forEach(message => {
+				setTimeout(() => {
+					if (message.parentNode) {
+						message.style.transition = 'opacity 0.5s ease';
+						message.style.opacity = '0';
+						setTimeout(() => message.remove(), 500);
+					}
+				}, 5000);
+			});
+
+			// Add click animation to competition cards
+			const cards = document.querySelectorAll('.competition-card');
+			cards.forEach(card => {
+				card.addEventListener('click', function(e) {
+					// Only animate if clicking on the card itself, not a button
+					if (e.target === this || (!e.target.closest('.btn') && !e.target.closest('.competition-actions'))) {
+						this.style.transform = 'scale(0.98)';
+						setTimeout(() => {
+							this.style.transform = '';
+						}, 150);
+					}
+				});
+			});
+
+			// Add typing effect to welcome message
+			const welcomeTitle = document.querySelector('.welcome-card h2');
+			if (welcomeTitle) {
+				const originalText = welcomeTitle.innerHTML;
+				welcomeTitle.innerHTML = '';
+				let i = 0;
+				
+				function typeWriter() {
+					if (i < originalText.length) {
+						welcomeTitle.innerHTML = originalText.substring(0, i + 1);
+						i++;
+						setTimeout(typeWriter, 50);
+					}
+				}
+				
+				setTimeout(typeWriter, 500);
+			}
+
+			// Animate verification banner if present
+			const verificationBanner = document.querySelector('.verification-banner');
+			if (verificationBanner) {
+				let pulseCount = 0;
+				setInterval(() => {
+					if (pulseCount < 3) {
+						verificationBanner.style.transform = 'scale(1.02)';
+						setTimeout(() => {
+							verificationBanner.style.transform = 'scale(1)';
+						}, 200);
+						pulseCount++;
+					}
+				}, 2000);
+			}
+
+			// Add smooth navigation highlighting
+			const navLinks = document.querySelectorAll('.nav-link');
+			navLinks.forEach(link => {
+				link.addEventListener('click', function(e) {
+					// Remove active class from all links
+					navLinks.forEach(l => l.classList.remove('active'));
+					// Add active class to clicked link
+					this.classList.add('active');
+				});
+			});
+		});
+	</script>
+
+{% endblock %}
