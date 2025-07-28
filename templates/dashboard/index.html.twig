@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord {% endblock %}
+{% block stylesheets %}
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+     <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+{% endblock %}
+
+{% block body %}
+<div id="dashboard-page" class="container">
+        <div class="dashboard-container">
+        <button class="mobile-toggle-btn border-0" type="button">
+        <i class='bx bx-menu'></i>
+    </button>
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">InnoMIAte</span>
+                    <button class="toggle-btn border-0" type="button">
+                     <i id="icon" class='bx bxs-chevrons-right'></i>
+                    </button>
+                </div>
+                <ul class="nav-menu">
+                    <li class="nav-item"">
+                        <a href="#" class="nav-link active" onclick="showPage('dashboard')">
+                            <span class="nav-icon"><i class="fas fa-home"></i></span>
+                            <span class="nav-text" ><strong>Accueil</strong></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showPage('profile-page')">
+                            <span class="nav-icon"><i class="fas fa-user"></i></span>
+                            <span class="nav-text"><strong>Profile</strong></span>
+                        </a>
+                    </li>
+                  
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showPage('participation-page')">
+                            <span class="nav-icon"><i class="fas fa-trophy"></i></span>
+                            <span class="nav-text"><strong>Mes Compétitions</strong></strong></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showPage('pitch-board-page')">
+                            <span class="nav-icon"><i class="fas fa-lightbulb"></i></span>
+                            <span class="nav-text"><strong>Pitch Board</strong></span>
+                        </a>
+                    </li>
+                    <li class="nav-item" style="margin-top: 30px;">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                            <span class="nav-text"><strong>se déconnecter</strong></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="page-header">
+                    <h1 class="page-title">Accueil</h1>
+                    <div class="user-profile">
+                        <div class="user-avatar">JS</div>
+                        <span class="user-name">John Smith</span>
+                    </div>
+                </div>
+                
+                <div class="glass-card" style="padding: 20px; margin-bottom: 30px;">
+                    <h2 style="font-size: 18px; margin-bottom: 10px;">Bienvenue, John !</h2>
+                    <p style="color: var(--text-dim);">De nouvelles opportunités viennent d’arriver — explorez les dernières compétitions ci-dessous et lancez-vous !</p>
+                </div>
+                
+                <h2 style="font-size: 20px; margin-bottom: 20px;">Compétitions en cours</h2>
+                
+                <div class="competition-grid">
+                    <!-- Competition 1 -->
+                    <div class="glass-card competition-card">
+                        <div class="competition-image">
+                             <img src="{{ asset('images/mascot.png') }}" alt="MIATHON Logo" class="miathon-logo">
+                        </div>
+                        <h3 class="competition-title">Miathon 3.0</h3>
+                        <p class="competition-desc">Le hackathon d’IA de référence avec 50 000 $ de prix. Créez des solutions d’IA innovantes en 72 heures.</p>
+                        <div class="competition-actions">
+                            <button class="btn btn-outline" onclick="window.open('https://www.MIA.com/page-details', '_blank')">EN SAVOIR PLUS</button>
+                            <button class="btn btn-green" onclick="showRegistrationModal()">S’INSCRIRE</button>
+                        </div>
+                    </div>                 
+            
+                               
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

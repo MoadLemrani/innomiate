@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Devenir Participant{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>INFORMATIONS PERSONNELLES</h1>
+
+        {{ form_start(form, { attr: { 'data-turbo': 'false' } }) }}
+
+    {{ form_row(form.nom) }}
+    {{ form_row(form.prenom) }}
+    {{ form_row(form.courrierProfessionnel) }}
+    {{ form_row(form.pays) }}
+    {{ form_row(form.ville) }}
+    {{ form_row(form.CIN) }}
+    {{ form_row(form.profession) }}
+
+    <button type="submit" name="next_step">Suivant</button>
+
+    {{form_end(form)}}
+
+    {# Affiche le formulaire spécifique selon la profession #}
+    {% if specificForm is not null %}
+    <h2> INFORMATIONS PROFESSIONNELLES</h2>
+    {{form_start(specificForm,{attr:{'data-turbo':'false'}})}}
+        {{ form_widget(specificForm) }}
+        <button type="submit">Terminer</button>
+        {{ form_end(specificForm) }}
+
+    {% endif %}
+
+
+
+    </div>
+{% endblock %}
