@@ -3,13 +3,27 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\CompetitionRepository;
+use App\Repository\InvitationRepository;
+use App\Enum\InvitationStatus;
 
 class DashboardController extends AbstractController
 {
+    private UserRepository $userRepository;
+    private CompetitionRepository $competitionRepository;
+    private InvitationRepository $invitationRepository;
+
+    public function __construct(UserRepository $userRepository, CompetitionRepository $competitionRepository, InvitationRepository $invitationRepository)
+    {
+        $this->userRepository = $userRepository;
+        $this->competitionRepository = $competitionRepository;
+        $this->invitationRepository = $invitationRepository;
+    }
+
     #[Route('/dashboard', name: 'app_dashboard')]
     public function participantDashboard(): Response
     {
@@ -22,11 +36,29 @@ class DashboardController extends AbstractController
         // Only users with ROLE_PARTICIPANT can access this page
         $this->denyAccessUnlessGranted('ROLE_PARTICIPANT');
 
-        return $this->render('participant/dashboard.html.twig');
+        // ✅ Fetch active competitions
+        $activeCompetitions = $this->competitionRepository->findActiveCompetitions();
+
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser(); //creating user interface
+
+        $participants = $user->getParticipants(); // returns Collection
+        $count = 0;
+        foreach ($participants as $participant) {
+            $count += $this->invitationRepository->count([
+                'receiverParticipant' => $participant,
+                'status' => InvitationStatus::PENDING,
+            ]);
+        }
+
+        return $this->render('participant/dashboard.html.twig', [
+            'activeCompetitions' => $activeCompetitions,
+            'invitationCount' => $count,
+        ]);
     }
 
     #[Route('/supadmin_dashboard', name: 'app_super_admin_dashboard')]
-    public function adminDashboard(EntityManagerInterface $entityManager): Response
+    public function adminDashboard(): Response
     {
         // Check if user is logged in
         if (!$this->getUser()) {
@@ -44,18 +76,18 @@ class DashboardController extends AbstractController
         /** @var User $currentUser */
         $currentUser = $this->getUser();
 
-        // Get all users except the current admin
-        $users = $entityManager->getRepository(User::class)
-            ->createQueryBuilder('u')
-            ->where('u.id != :currentUserId')
-            ->setParameter('currentUserId', $currentUser->getId())
-            ->orderBy('u.email', 'ASC')
-            ->getQuery()
-            ->getResult();
+        // Get all users except the current admin using repository method
+        $users = $this->userRepository->findAllExceptUser($currentUser);
+
+        // Get additional dashboard data
+        $unverifiedUsers = $this->userRepository->findUnverifiedUsers();
+        $userStats = $this->userRepository->getUserStatistics();
 
         return $this->render('super_admin/dashboard.html.twig', [
             'users' => $users,
-            'currentUser' => $currentUser
+            'currentUser' => $currentUser,
+            'unverifiedUsers' => $unverifiedUsers,
+            'userStats' => $userStats
         ]);
     }
 }

@@ -1,0 +1,592 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Devenir Participant{% endblock %}
+
+{% block body %}
+<style>
+.main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
+    min-height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+}
+
+h1, h2 {
+    color: #075c22; /* Slightly darker green for better contrast */
+    margin-bottom: 24px;
+    font-weight: 700;
+    letter-spacing: -0.6px;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+.form-section {
+    background-color: #ffffffcc; /* Slight transparency for subtle glass effect */
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    padding: 40px 30px;
+    margin: 0 auto 48px auto;
+    width: 100%;
+    max-width: 900px;
+    transition: box-shadow 0.4s ease, transform 0.4s ease;
+    border: 1px solid #d1d9de;
+}
+
+.form-section:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px);
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border-radius: 14px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #222;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    letter-spacing: 0.6px;
+    user-select: none;
+}
+
+.form-control {
+    height: 48px;
+    font-size: 1rem;
+    border: 1.8px solid #b0bbc4;
+    border-radius: 8px;
+    padding: 12px 18px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: #fafafa;
+    color: #111;
+    font-weight: 500;
+    outline-offset: 2px;
+}
+
+.form-control:focus {
+    border-color: #075c22;
+    box-shadow: 0 0 6px rgba(7, 92, 34, 0.4);
+    background-color: #fff;
+    outline: none;
+}
+
+select.form-control {
+    color: #222 !important;
+    background-color: #fff !important;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23075622' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px;
+    cursor: pointer;
+}
+
+.btn {
+    font-size: 1.15rem;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+}
+
+.btn-marathon {
+    background-color: #075c22;
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(7, 92, 34, 0.5);
+}
+
+.btn-marathon:hover,
+.btn-marathon:focus {
+    background-color: #054619;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(7, 92, 34, 0.7);
+    outline: none;
+}
+
+.btn-danger-marathon {
+    background-color: #b20817;
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(178, 8, 23, 0.5);
+}
+
+.btn-danger-marathon:hover,
+.btn-danger-marathon:focus {
+    background-color: #8e0614;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(178, 8, 23, 0.7);
+    outline: none;
+}
+
+.btn-upload {
+    background-color: #075c22;
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    font-size: 1rem;
+    box-shadow: 0 3px 10px rgba(7, 92, 34, 0.45);
+    user-select: none;
+}
+
+.btn-upload:hover,
+.btn-upload:focus {
+    background-color: #054619;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(7, 92, 34, 0.65);
+    outline: none;
+}
+
+.btn-upload i {
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
+.custom-file-upload {
+    margin-bottom: 22px;
+}
+
+.file-name-display {
+    margin-left: 14px;
+    font-size: 0.95rem;
+    color: #444;
+    font-style: italic;
+    vertical-align: middle;
+    user-select: none;
+}
+
+.inner-card {
+    background-color: #f4f6f8;
+    border-radius: 10px;
+    border-left: 5px solid #075c22;
+    padding: 26px;
+    margin-bottom: 30px;
+    box-shadow: inset 0 0 6px rgba(7, 92, 34, 0.07);
+}
+
+.confirmation-section {
+    background-color: #f4f6f8;
+    border-radius: 10px;
+    padding: 26px;
+    margin-bottom: 30px;
+    border-left: 5px solid #075c22;
+    box-shadow: inset 0 0 6px rgba(7, 92, 34, 0.07);
+}
+
+.confirmation-section p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+
+.form-group-spaced {
+    margin-bottom: 1.8rem;
+}
+
+.text-end {
+    text-align: right;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main {
+        padding: 40px 15px;
+    }
+    .form-section {
+        padding: 25px 20px;
+    }
+    .btn {
+        padding: 12px 24px;
+        font-size: 1.05rem;
+    }
+    .btn-upload {
+        padding: 10px 22px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#step2-section {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('🚀 Script de gestion des fichiers initialisé');
+// Masquer la deuxième carte initialement
+    const professionalSection = document.getElementById('professional-info-section');
+    if (professionalSection) {
+        professionalSection.style.display = 'none';
+    }
+    // Gestion du clic sur "Suivant"
+    const nextButton = document.querySelector('button[name="next_step"]');
+    if (nextButton) {
+        nextButton.addEventListener('click', function() {
+            // Stocker en session que l'étape 1 est validée
+            sessionStorage.setItem('step1_completed', 'true');
+        });
+        // Afficher la deuxième carte si l'étape 1 est déjà validée
+    if (sessionStorage.getItem('step1_completed') === 'true' && professionalSection) {
+        professionalSection.style.display = 'block';
+    }
+    }
+    // ✅ GESTION FICHIER 1 : Document d'identité
+    const inputFile1 = document.getElementById('{{ form.documentIdentite.vars.id }}');
+    const fileNameSpan1 = document.getElementById('file-name');
+    if (inputFile1 && fileNameSpan1) {
+        inputFile1.addEventListener('change', function () {
+            const file = inputFile1.files[0];
+            if (file) {
+                fileNameSpan1.textContent = file.name;
+                console.log('✅ Fichier 1 sélectionné:', file.name);
+            } else {
+                fileNameSpan1.textContent = "Aucun fichier sélectionné";
+            }
+        });
+        console.log('✅ Event listener fichier 1 ajouté');
+    }
+    // ✅ GESTION FICHIER 2 : Carte Attestation
+    {% if specificForm is not null %}
+    const inputFile2 = document.getElementById('{{ specificForm.CarteAttestation.vars.id }}');
+    const fileNameSpan2 = document.getElementById('file-name-{{ specificForm.CarteAttestation.vars.id }}');
+    if (inputFile2 && fileNameSpan2) {
+        inputFile2.addEventListener('change', function () {
+            const file = inputFile2.files[0];
+            if (file) {
+                fileNameSpan2.textContent = file.name;
+                console.log('✅ Fichier 2 sélectionné:', file.name);
+            } else {
+                fileNameSpan2.textContent = "Aucun fichier sélectionné";
+            }
+        });
+        console.log('✅ Event listener fichier 2 ajouté');
+    } else {
+        console.log('❌ Éléments fichier 2 non trouvés');
+    }
+    {% endif %}
+    // ✅ MÉTHODE UNIVERSELLE pour tous les futurs fichiers
+    document.querySelectorAll('input[type="file"]').forEach(function(input, index) {
+        input.addEventListener('change', function() {
+            const file = input.files[0];
+            const targetId = input.getAttribute('data-upload-target');
+            let fileNameSpan = null;
+            // Chercher le span correspondant
+            if (targetId) {
+                fileNameSpan = document.getElementById(targetId);
+            } else {
+                // Chercher le span suivant
+                fileNameSpan = input.closest('.custom-file-upload').querySelector('.file-name-display');
+            }
+            if (fileNameSpan) {
+                if (file) {
+                    fileNameSpan.textContent = file.name;
+                    console.log(✅ Fichier ${index + 1} sélectionné:, file.name);
+                } else {
+                    fileNameSpan.textContent = "Aucun fichier sélectionné";
+                }
+            }
+        });
+    });
+});
+// Gestion du scroll vers l'étape 2
+document.addEventListener('DOMContentLoaded', function() {
+    // Vérifie si on vient de valider l'étape 1
+    {% if form.vars.submitted and form.vars.valid %}
+        scrollToStep2();
+    {% endif %}
+
+    // Gestion du clic sur "Suivant"
+    const nextButton = document.querySelector('button[name="next_step"]');
+    if (nextButton) {
+        nextButton.addEventListener('click', function() {
+            // Stocke en session que l'étape 1 est complète
+            sessionStorage.setItem('step1_completed', 'true');
+        });
+    }
+    function scrollToStep2() {
+        const step2Section = document.getElementById('step2-section');
+        if (step2Section) {
+            // Scroll en douceur avec décalage pour la barre de navigation
+            window.scrollTo({
+                top: step2Section.offsetTop - 100,
+                behavior: 'smooth'
+            });
+            
+            // Marquage visuel (optionnel)
+            step2Section.style.boxShadow = '0 0 0 2px #07702C';
+            setTimeout(() => {
+                step2Section.style.boxShadow = 'none';
+            }, 2000);
+        }
+    }
+});
+document.addEventListener('DOMContentLoaded', function() {
+    const inputFile = document.getElementById('{{ form.documentIdentite.vars.id }}');
+    const fileNameSpan = document.getElementById('file-name');
+    
+    // Restaure le nom du fichier depuis la session au chargement
+    {% if session.get('document_uploaded') %}
+    fileNameSpan.textContent = '{{ session.get("document_uploaded")["original"] }}';
+    {% endif %}
+    
+    // Gestion des nouveaux fichiers
+    if (inputFile) {
+        inputFile.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileNameSpan.textContent = this.files[0].name;
+            } else {
+                fileNameSpan.textContent = "{% if session.get('document_uploaded') %}{{ session.get('document_uploaded')['original'] }}{% else %}Aucun fichier sélectionné{% endif %}";
+            }
+        });
+    }
+});
+</script>
+
+<div class="main">
+    <div class="container mt-4 mb-4">
+        {# Première carte - Informations Personnelles #}
+        <div class="form-section" id="step1-section">
+            <h1 class="text-center form-main-title" >INFORMATIONS PERSONNELLES</h1>
+            <div class="form-section glass-card p-4" style="max-width: 800px; margin: 0 auto; border: 1px solid #000; background: #fff;">
+                {{ form_start(form, { attr: { 'data-turbo': 'false' } }) }}
+                
+                {# Ligne Nom/Prénom #}
+                <div class="row mb-4">
+                    <div class="col-md-6 pe-md-3">
+                        <div class="form-group-spaced">
+                            {{ form_row(form.nom, {
+                                'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Votre nom',
+                                    'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
+                                },
+                                'label_attr': {
+                                    'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                                }
+                            }) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6 ps-md-3">
+                        <div class="form-group-spaced">
+                            {{ form_row(form.prenom, {
+                                'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Votre prénom',
+                                    'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
+                                },
+                                'label_attr': {
+                                    'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                                }
+                            }) }}
+                        </div>
+                    </div>
+                </div>
+                
+                {# Email #}
+                <div class="form-group-spaced mb-4">
+                    {{ form_row(form.courrierProfessionnel, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'exemple@email.com',
+                            'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
+                        },
+                        'label_attr': {
+                            'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                        }
+                    }) }}
+                </div>
+                
+                {# Ligne Pays/Ville #}
+                <div class="row mb-4">
+                    <div class="col-md-6 pe-md-3">
+                        <div class="form-group-spaced">
+                            {{ form_row(form.pays, {
+                                'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Votre pays',
+                                    'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
+                                },
+                                'label_attr': {
+                                    'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                                }
+                            }) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6 ps-md-3">
+                        <div class="form-group-spaced">
+                            {{ form_row(form.ville, {
+                                'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Votre ville',
+                                    'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
+                                },
+                                'label_attr': {
+                                    'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                                }
+                            }) }}
+                        </div>
+                    </div>
+                </div>
+                
+                {# Document d'identité #}
+                <div class="form-group-spaced mb-4">
+    <div class="custom-file-upload">
+        {{ form_label(form.documentIdentite, null, {
+            'label_attr': {
+                'style': 'font-size: 1.1rem; font-weight: 500; color: #000; display: block; margin-bottom: 8px;'
+            }
+        }) }}
+        <label for="{{ form.documentIdentite.vars.id }}" class="btn btn-upload" style="display: inline-block;">
+            <i class="fas fa-cloud-upload-alt me-2"></i> Choisir un fichier
+            {{ form_widget(form.documentIdentite, {
+                'attr': {
+                    'style': 'display: none;'
+                }
+            }) }}
+        </label>
+        <span id="file-name" class="file-name-display" style="margin-left: 10px; font-size: 0.9rem; color: #000;">{% if session.get('document_uploaded') %}
+            {{ session.get('document_uploaded')['original'] }}
+        {% else %}
+            Aucun fichier sélectionné
+        {% endif %}</span>
+        <small class="form-text d-block mt-2" style="font-size: 0.9rem; color: #000;">Formats acceptés: PDF, JPG, PNG (max 2Mo)</small>
+    </div>
+</div>
+                
+                {# Profession #}
+                <div class="form-group-spaced mb-4">
+                    {{ form_row(form.profession, {
+                        'attr': {
+                            'class': 'form-control',
+                            'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
+                        },
+                        'label_attr': {
+                            'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                        }
+                    }) }}
+                </div>
+                
+                {# Bouton Suivant #}
+                <div class="text-end mt-4">
+                    <button type="submit" name="next_step" class="btn btn-marathon" style="font-size: 1.1rem; padding: 10px 25px; border: 1px solid #000; background-color: #07702C; color: white;">
+                        Suivant <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+                
+                {{ form_end(form) }}
+            </div>
+        </div>
+
+        {# Deuxième carte - Informations Professionnelles #}
+        {% if specificForm is not null %}
+        <div class="form-section mt-5" id="step2-section" >
+        {% if not (form.vars.submitted and form.vars.valid) %}style="display:none"{% endif %}
+            <h1 class="text-center form-main-titl">INFORMATIONS PROFESSIONNELLES</h1>
+            <div class="form-section glass-card p-4" style="max-width: 800px; margin: 0 auto; border: 1px solid #000; background: #fff;">
+                {{ form_start(specificForm, { attr: { 'data-turbo': 'false' } }) }}
+                
+                {# Carte interne #}
+                <div class="inner-card p-4 mb-4" style="background-color: #f8f9fa; border-radius: 5px; border-left: 4px solid #07702C;">
+                    {% for field in specificForm %}
+                        {% if field.vars.name != '_token' and field.vars.name != 'confirmation' %}
+                            <div class="form-group-spaced mb-4">
+                                {{ form_label(field, null, {
+                                    'label_attr': {
+                                        'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                                    }
+                                }) }}
+                                
+                                {% if field.vars.block_prefixes.1 == 'choice' %}
+                                    {{ form_widget(field, {
+                                        'attr': {
+                                            'class': 'form-control',
+                                            'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
+                                        }
+                                    }) }}
+                                {% elseif field.vars.block_prefixes.1 == 'file' %}
+    <div class="custom-file-upload mb-4">
+       
+        <label for="{{  field.vars.id }}" class="btn btn-upload" >
+            <i class="fas fa-cloud-upload-alt me-2"></i> Choisir un fichier
+            {{ form_widget(field, {
+                'attr': {
+                    'style': 'display: none;',
+                    'data-upload-target': 'file-name-' ~ field.vars.id
+                }
+            }) }}
+        </label>
+        <span id="file-name-{{ field.vars.id }}"  class="file-name-display" style="margin-left: 10px; font-size: 0.9rem; color: #000;">Aucun fichier sélectionné</span>
+        <small class="form-text d-block mt-2" style="font-size: 0.9rem; color: #000;">Formats acceptés: PDF, JPG, PNG (max 2Mo)</small>
+    </div>
+                                {% else %}
+                                    {{ form_widget(field, {
+                                        'attr': {
+                                            'class': 'form-control',
+                                            'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
+                                        }
+                                    }) }}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                {# Section confirmation #}
+                {% if specificForm.confirmation is defined %}
+                <div class="confirmation-section p-3 mb-4" style="background-color: #f8f9fa; border-radius: 5px;">
+                    <p style="font-size: 1rem; color: #000; margin-bottom: 1rem;">
+                        Par la présente, je certifie l'exactitude des informations fournies et je consens à les partager avec le comité scientifique de l'événement à des fins organisationnelles conformément à la loi 09-08.
+                    </p>
+                    <div class="confirmation-options">
+                        {{ form_widget(specificForm.confirmation, {
+                            'attr': {
+                                'style': 'display: flex; gap: 20px; color: #000;'
+                            }
+                        }) }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {# Bouton Terminer #}
+                <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-danger-marathon" style="font-size: 1.1rem; padding: 10px 25px; border: 1px solid #000; background-color: #B60817; color: white;">
+                        Terminer
+                    </button>
+                </div>
+                
+                {{ form_end(specificForm) }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

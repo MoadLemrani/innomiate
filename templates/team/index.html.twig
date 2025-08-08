@@ -1,0 +1,717 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion d'Équipe{% endblock %}
+
+{% block body %}
+    <style>
+        /* =================================
+           CSS VARIABLES & ROOT SETTINGS
+           ================================= */
+        :root {
+            --primary-red: #ff3e5f;
+            --primary-green: #2ecc71;
+            --primary-accent: #e74c3c;
+            --primary-white: #ffffff;
+            --dark-bg: #0f1621;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --text-light: #f0f0f0;
+            --text-dim: #b0b0b0;
+            --shadow-neon-red: 0 0 10px rgba(255, 62, 95, 0.3);
+            --shadow-neon-green: 0 0 10px rgba(46, 204, 113, 0.3);
+            --shadow-neon-accent: 0 0 10px rgba(231, 76, 60, 0.3);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --card-background: rgba(255, 255, 255, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        :root[data-theme="light"] {
+            --primary-red: #e74c3c;
+            --primary-green: #27ae60;
+            --primary-accent: #c0392b;
+            --primary-white: #000000;
+            --dark-bg: #f8f9fa;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --text-light: #2c3e50;
+            --text-dim: #6c757d;
+            --shadow-neon-red: 0 0 10px rgba(231, 76, 60, 0.2);
+            --shadow-neon-green: 0 0 10px rgba(39, 174, 96, 0.2);
+            --shadow-neon-accent: 0 0 10px rgba(192, 57, 43, 0.2);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --card-background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* =================================
+           THEME TOGGLE
+           ================================= */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+            background: var(--card-background);
+            border: 2px solid var(--text-light);
+            border-radius: 50px;
+            padding: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px var(--shadow-color);
+        }
+
+        .theme-toggle .sun-icon,
+        .theme-toggle .moon-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle svg {
+            width: 24px;
+            height: 24px;
+            display: block;
+            color: currentColor;
+            transition: var(--transition);
+        }
+
+        .theme-toggle .sun-icon svg {
+            color: #ffa500;
+        }
+
+        .theme-toggle .moon-icon svg {
+            color: #4cc9f0;
+        }
+
+        /* =================================
+           ANIMATIONS & KEYFRAMES
+           ================================= */
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* =================================
+           MAIN LAYOUT COMPONENTS
+           ================================= */
+        .team-container {
+            display: flex;
+            min-height: 100vh;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        .team-illustration {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(255, 62, 95, 0.1) 0%, rgba(46, 204, 113, 0.1) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+
+        .team-illustration::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 62, 95, 0.15) 0%, transparent 70%);
+            animation: pulse 15s infinite alternate;
+        }
+
+        .team-illustration::after {
+            content: "";
+            position: absolute;
+            bottom: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(46, 204, 113, 0.15) 0%, transparent 70%);
+            animation: pulse 15s infinite alternate-reverse;
+        }
+
+        .team-illustration-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .team-illustration h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .team-illustration p {
+            color: var(--text-dim);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Light theme adjustments for illustration */
+        :root[data-theme="light"] .team-illustration {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.25) 0%, rgba(39, 174, 96, 0.25) 100%);
+        }
+
+        :root[data-theme="light"] .team-illustration::before {
+            background: radial-gradient(circle, rgba(231, 76, 60, 0.2) 0%, transparent 70%);
+        }
+
+        :root[data-theme="light"] .team-illustration::after {
+            background: radial-gradient(circle, rgba(39, 174, 96, 0.2) 0%, transparent 70%);
+        }
+
+        .team-form-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .team-form {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-background);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Light theme form adjustments */
+        :root[data-theme="light"] .team-form {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* =================================
+           LOGO & BRANDING
+           ================================= */
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            width: 64px;
+            height: 64px;
+            margin-right: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* =================================
+           TYPOGRAPHY
+           ================================= */
+        .team-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .team-subtitle {
+            color: var(--text-dim);
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        /* =================================
+           TAB NAVIGATION
+           ================================= */
+        .team-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        :root[data-theme="light"] .team-tabs {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .team-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            color: var(--text-dim);
+        }
+
+        .team-tab.active {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-accent) 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .team-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        :root[data-theme="light"] .team-tab:hover:not(.active) {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        /* =================================
+           FORM STYLES
+           ================================= */
+        .form-group {
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-light);
+            transition: var(--transition);
+            box-sizing: border-box;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--text-dim);
+            opacity: 0.7;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(255, 62, 95, 0.2);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Light theme form adjustments */
+        :root[data-theme="light"] input,
+        :root[data-theme="light"] textarea,
+        :root[data-theme="light"] select {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            color: var(--text-light);
+        }
+
+        :root[data-theme="light"] input:focus,
+        :root[data-theme="light"] textarea:focus,
+        :root[data-theme="light"] select:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+        }
+
+        /* =================================
+           BUTTON STYLES
+           ================================= */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-accent) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #ff2847 0%, #c0392b 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-neon-red);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary-red);
+            color: var(--primary-red);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 62, 95, 0.1);
+            box-shadow: none;
+        }
+
+        /* =================================
+           HELP TEXT & MESSAGES
+           ================================= */
+        .help-text {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.1);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .alert-warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            border: 1px solid #ffc107;
+            color: #ffc107;
+        }
+
+        .alert-error {
+            background-color: rgba(255, 62, 95, 0.1);
+            border: 1px solid var(--primary-red);
+            color: var(--primary-red);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* =================================
+           TAB CONTENT
+           ================================= */
+        .tab-content {
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* =================================
+           RESPONSIVE ADJUSTMENTS
+           ================================= */
+        @media (max-width: 992px) {
+            .team-container {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 2rem;
+            }
+
+            .team-illustration {
+                padding: 2rem;
+            }
+
+            .team-illustration::before,
+            .team-illustration::after {
+                display: none;
+            }
+
+            .team-form {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .team-tabs {
+                flex-direction: column;
+            }
+
+            .team-tab {
+                padding: 0.75rem;
+            }
+
+            .logo {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .logo-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .logo-text {
+                font-size: 20px;
+            }
+
+            .team-title {
+                font-size: 22px;
+                text-align: center;
+            }
+
+            .team-subtitle {
+                text-align: center;
+                font-size: 14px;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 8px;
+            }
+
+            .theme-toggle svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
+
+    <!-- Theme Toggle Button -->
+    <button id="darkModeToggle" class="theme-toggle">
+        <span class="sun-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z"/>
+            </svg>
+        </span>
+        <span class="moon-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z" clip-rule="evenodd"/>
+            </svg>
+        </span>
+    </button>
+
+    <div class="team-container">
+        <div class="team-illustration">
+            <div class="team-illustration-content">
+                <h2>CRÉEZ OU REJOIGNEZ UNE ÉQUIPE</h2>
+                <p>Collaborez avec des talents complémentaires pour maximiser vos chances de succès dans la compétition.</p>
+            </div>
+        </div>
+
+        <div class="team-form-container">
+            <div class="team-form">
+                <div class="logo">
+                    <span class="logo-icon">
+                        <img src="/images/MIA_Logo.png" alt="MIA Logo" />
+                    </span>
+                    <span class="logo-text">INNOMIATE</span>
+                </div>
+
+                <h1 class="team-title">Gestion d'Équipe</h1>
+                <p class="team-subtitle">Choisissez comment vous souhaitez participer à la compétition</p>
+
+                <!-- Flash Messages -->
+                {% for type, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ type }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                <div class="team-tabs">
+                    <div class="team-tab active" data-tab="create">Créer</div>
+                    <div class="team-tab" data-tab="join">Rejoindre</div>
+                    <div class="team-tab" data-tab="pitch">Publier</div>
+                </div>
+
+                <!-- Option 1: Créer une équipe -->
+                <div id="create-tab" class="tab-content active">
+                    <form method="POST" action="{{ path('team_create') }}">
+                        <div class="form-group">
+                            <label for="team-name">Nom de l'équipe</label>
+                            <input type="text" id="team-name" name="team[name]" placeholder="Donnez un nom à votre équipe" required>
+                            <p class="help-text">Ce nom sera visible par tous les participants</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="member-codes">Codes des membres</label>
+                            <textarea id="member-codes" name="team[memberCodes]" placeholder="Entrez les codes participant de vos coéquipiers, séparés par des virgules"></textarea>
+                            <p class="help-text">Vous pouvez ajouter des membres. Chacun recevra une invitation.</p>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-block">Créer l'équipe</button>
+                    </form>
+                </div>
+
+                <!-- Option 2: Rejoindre une équipe -->
+                <div id="join-tab" class="tab-content">
+                    <form method="POST" action="{{ path('team_join') }}">
+                        <div class="form-group">
+                            <label for="team-id-input">Identifiant d'équipe</label>
+                            <input type="text" id="team-id-input" name="join_team[teamId]" placeholder="Entrez l'identifiant fourni par votre leader" required>
+                            <p class="help-text">Demandez cet identifiant au leader de l'équipe que vous souhaitez rejoindre</p>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-block">Envoyer la demande</button>
+                    </form>
+                </div>
+
+                <!-- Option 3: Publier un pitch -->
+                <div id="pitch-tab" class="tab-content">
+                    <form method="POST" action="{{ path('team_pitch') }}">
+                        <div class="form-group">
+                            <label for="project-pitch">Votre pitch</label>
+                            <textarea id="project-pitch" name="pitch[description]" placeholder="Décrivez votre idée de projet (objectifs, technologies, besoins...)" required></textarea>
+                            <p class="help-text">Soyez convaincant ! Expliquez pourquoi votre projet est intéressant et quels talents vous recherchez.</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contact-info">Coordonnées</label>
+                            <input type="text" id="contact-info" name="pitch[contactInfo]" placeholder="Comment vous contacter ?" required>
+                            <p class="help-text">Email, lien LinkedIn, ou autre moyen de contact</p>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-block">Publier le pitch</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Management
+        document.querySelectorAll('.team-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('darkModeToggle');
+        const sunIcon = themeToggle.querySelector('.sun-icon');
+        const moonIcon = themeToggle.querySelector('.moon-icon');
+
+        function updateToggleIcons(isDark) {
+            // Show sun icon when in dark mode (to switch to light)
+            // Show moon icon when in light mode (to switch to dark)
+            sunIcon.style.display = isDark ? 'flex' : 'none';
+            moonIcon.style.display = isDark ? 'none' : 'flex';
+        }
+
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Prioritize saved theme, fallback to system preference
+            const defaultTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+            
+            // Apply theme immediately to prevent flash
+            document.documentElement.setAttribute('data-theme', defaultTheme);
+            
+            // Update toggle icons
+            updateToggleIcons(defaultTheme === 'dark');
+            
+            // Save the theme if it wasn't saved before
+            if (!savedTheme) {
+                localStorage.setItem('theme', defaultTheme);
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            localStorage.setItem('theme-manually-set', 'true');
+            updateToggleIcons(newTheme === 'dark');
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTheme();
+        });
+
+        // Theme toggle event listeners
+        themeToggle.addEventListener('click', toggleTheme);
+        themeToggle.addEventListener('keydown', function (e) {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                toggleTheme();
+            }
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+            const manuallySet = localStorage.getItem('theme-manually-set');
+            if (!manuallySet) {
+                const newTheme = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateToggleIcons(newTheme === 'dark');
+            }
+        });
+    </script>
+{% endblock %}

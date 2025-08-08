@@ -13,6 +13,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
+use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 
 class RegistrationFormType extends AbstractType
 {
@@ -79,6 +81,21 @@ class RegistrationFormType extends AbstractType
                     ]),
                 ],
             ])
+            /*->add('recaptcha', EWZRecaptchaType::class, [
+                'mapped' => false,
+                'constraints' => [new RecaptchaTrue([
+                    'message' => 'Veuillez confirmer que vous n\'êtes pas un robot',
+                ])],
+                'attr' => [
+                    'options' => [
+                        'theme' => 'light', // or 'dark'
+                        'type'  => 'image',  // or 'audio'
+                        'size'  => 'normal', // or 'compact'
+                        'defer' => true,
+                        'async' => true,
+                    ]
+                ]
+            ])*/
         ;
     }
 

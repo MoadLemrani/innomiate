@@ -1,0 +1,6 @@
+# config/packages/ewz_recaptcha.yaml
+ewz_recaptcha:
+    public_key: '%env(EWZ_RECAPTCHA_SITE_KEY)%'
+    private_key: '%env(EWZ_RECAPTCHA_SECRET)%'
+    locale_key: '%kernel.default_locale%'  # This should be locale, not site key
+    enabled: true

@@ -5,35 +5,95 @@
 
 {% block body %}
 	<div class="dashboard-container">
-		<h1 class="dashboard-title">Bonjour, Super Administrateur 👋</h1>
+		<h1 class="dashboard-title">Bonjour,
+			{{ currentUser.firstName ?? 'Super Administrateur' }}
+			👋</h1>
 		<p class="dashboard-subtitle">Bienvenue sur votre tableau de bord.</p>
 
-		<table class="styled-table">
-			<thead>
-				<tr>
-					<th>Email</th>
-					<th>Rôles</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for user in users %}
+		{# Statistics Section #}
+		<div class="stat-card">
+			<h3>Total Users</h3>
+			<p class="stat-value">{{ userStats.total }}</p>
+		</div>
+		<div class="stat-card">
+			<h3>Verified Users</h3>
+			<p class="stat-value">{{ userStats.verified }}</p>
+		</div>
+		<div class="stat-card">
+			<h3>Unverified Users</h3>
+			<p class="stat-value">{{ userStats.unverified }}</p>
+		</div>
+		<div class="stat-card">
+			<h3>Verification Rate</h3>
+			<p class="stat-value">{{ (userStats.verification_rate)|number_format(1) }}%</p>
+		</div>
+
+		{# Unverified Users Section #}
+		{% if unverifiedUsers|length > 0 %}
+			<div class="section">
+				<h2>Users Awaiting Verification</h2>
+				<div class="unverified-users">
+					{% for user in unverifiedUsers %}
+						<div class="user-card">
+							<p>{{ user.email }}</p>
+							<div class="actions">
+								<button class="verify-btn">Verify</button>
+								<button class="reject-btn">Reject</button>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		{% endif %}
+
+		{# All Users Table #}
+		<div class="section">
+			<h2>User Management</h2>
+			<table class="styled-table">
+				<thead>
 					<tr>
-						<td>{{ user.email }}</td>
-						<td>
-							{% for role in user.roles %}
-								<span class="badge">{{ role }}</span>
-							{% endfor %}
-						</td>
-						<td>
-							<a href="#" class="action-link">Modifier</a>
-							|
-							<a href="#" class="action-link delete">Supprimer</a>
-						</td>
+						<th>Email</th>
+						<th>First Name</th>
+						<th>Last Name</th>
+						<th>Rôles</th>
+						<th>Status</th>
+						<th>Actions</th>
 					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{% for user in users %}
+						<tr>
+							<td>{{ user.email }}</td>
+							<td>{{ user.firstName ?? 'N/A' }}</td>
+							<td>{{ user.lastName ?? 'N/A' }}</td>
+							<td>
+								{% for role in user.roles %}
+									{% if role != 'ROLE_USER' %}
+										<span class="badge {{ role == 'ROLE_ADMIN' ? 'admin-badge' : 'participant-badge' }}">
+											{{ role|replace({'ROLE_': ''})|lower|capitalize }}
+										</span>
+									{% endif %}
+								{% endfor %}
+							</td>
+							<td>
+								<span class="status-badge {{ user.isVerified ? 'verified' : 'unverified' }}">
+									{{ user.isVerified ? 'Verified' : 'Unverified' }}
+								</span>
+							</td>
+							<td class="actions">
+								<a href="#" class="action-link edit">Modifier</a>
+								|
+								<a href="#" class="action-link delete">Supprimer</a>
+								{% if not user.isVerified %}
+									|
+									<a href="#" class="action-link verify">Verify</a>
+								{% endif %}
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
 
 		<a href="{{ path('app_logout') }}" class="logout-link">🚪 Déconnexion</a>
 
@@ -51,7 +111,8 @@
 		</button>
 
 		<script>
-			const themeToggle = document.getElementById('darkModeToggle');
+			// Same JavaScript as before
+const themeToggle = document.getElementById('darkModeToggle');
 const sunIcon = themeToggle.querySelector('.sun-icon');
 const moonIcon = themeToggle.querySelector('.moon-icon');
 
@@ -61,9 +122,9 @@ const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 const defaultTheme = savedTheme || (prefersDark ? 'dark' : 'light');
 document.documentElement.setAttribute('data-theme', defaultTheme);
 updateToggleIcons(defaultTheme === 'dark');
-if (! savedTheme) 
+if (! savedTheme) {
 localStorage.setItem('theme', defaultTheme);
-
+}
 }
 
 function updateToggleIcons(isDark) {
@@ -97,6 +158,8 @@ toggleTheme();
 			--secondary: #b0b0b0;
 			--accent: #2ecc71;
 			--danger: #ff3e5f;
+			--warning: #f39c12;
+			--info: #3498db;
 			--card: rgba(255, 255, 255, 0.05);
 			--border: rgba(255, 255, 255, 0.1);
 		}
@@ -106,6 +169,8 @@ toggleTheme();
 			--secondary: #6c757d;
 			--accent: #27ae60;
 			--danger: #e74c3c;
+			--warning: #e67e22;
+			--info: #2980b9;
 			--card: #ffffff;
 			--border: #dee2e6;
 		}
@@ -119,7 +184,7 @@ toggleTheme();
 
 		.dashboard-container {
 			padding: 2rem;
-			max-width: 1000px;
+			max-width: 1200px;
 			margin: auto;
 		}
 
@@ -131,6 +196,44 @@ toggleTheme();
 		.dashboard-subtitle {
 			color: var(--secondary);
 			margin-bottom: 2rem;
+		}
+
+		.section {
+			margin-bottom: 2rem;
+		}
+
+		.section h2 {
+			border-bottom: 2px solid var(--accent);
+			padding-bottom: 0.5rem;
+			margin-bottom: 1rem;
+		}
+
+		.stats-container {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1rem;
+			margin-bottom: 2rem;
+		}
+
+		.stat-card {
+			background: var(--card);
+			border-radius: 8px;
+			padding: 1.5rem;
+			text-align: center;
+			border: 1px solid var(--border);
+		}
+
+		.stat-card h3 {
+			margin-top: 0;
+			color: var(--secondary);
+			font-size: 1rem;
+		}
+
+		.stat-value {
+			font-size: 2rem;
+			font-weight: bold;
+			margin: 0.5rem 0 0;
+			color: var(--accent);
 		}
 
 		.styled-table {
@@ -160,22 +263,99 @@ toggleTheme();
 
 		.badge {
 			display: inline-block;
-			background-color: var(--accent);
-			color: white;
 			padding: 3px 8px;
 			border-radius: 12px;
 			font-size: 0.75rem;
 			margin-right: 5px;
+			color: white;
+		}
+
+		.admin-badge {
+			background-color: var(--danger);
+		}
+
+		.participant-badge {
+			background-color: var(--info);
+		}
+
+		.status-badge {
+			display: inline-block;
+			padding: 3px 8px;
+			border-radius: 12px;
+			font-size: 0.75rem;
+			color: white;
+		}
+
+		.status-badge.verified {
+			background-color: var(--accent);
+		}
+
+		.status-badge.unverified {
+			background-color: var(--warning);
 		}
 
 		.action-link {
-			color: var(--accent);
 			text-decoration: none;
 			font-weight: 500;
+			padding: 2px 5px;
+			border-radius: 4px;
+		}
+
+		.action-link.edit {
+			color: var(--info);
 		}
 
 		.action-link.delete {
 			color: var(--danger);
+		}
+
+		.action-link.verify {
+			color: var(--accent);
+		}
+
+		.actions {
+			white-space: nowrap;
+		}
+
+		.unverified-users {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			gap: 1rem;
+			margin-bottom: 2rem;
+		}
+
+		.user-card {
+			background: var(--card);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			padding: 1rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.user-card p {
+			margin: 0;
+		}
+
+		.verify-btn,
+		.reject-btn {
+			border: none;
+			padding: 5px 10px;
+			border-radius: 4px;
+			cursor: pointer;
+			font-weight: 500;
+		}
+
+		.verify-btn {
+			background-color: var(--accent);
+			color: white;
+			margin-right: 5px;
+		}
+
+		.reject-btn {
+			background-color: var(--danger);
+			color: white;
 		}
 
 		.logout-link {
@@ -191,13 +371,13 @@ toggleTheme();
 			top: 20px;
 			right: 20px;
 			z-index: 999;
-			background: var(--card-background);
-			border: 2px solid var(--text-light);
+			background: var(--card);
+			border: 2px solid var(--border);
 			border-radius: 50px;
 			padding: 10px;
 			cursor: pointer;
-			box-shadow: 0 4px 15px var(--shadow-color);
-			transition: var(--transition);
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+			transition: all 0.3s ease;
 			display: flex;
 			align-items: center;
 			gap: 8px;
@@ -205,7 +385,7 @@ toggleTheme();
 
 		.theme-toggle:hover {
 			transform: scale(1.05);
-			box-shadow: 0 6px 20px var(--shadow-color);
+			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 		}
 
 		.theme-toggle .sun-icon,
@@ -220,7 +400,7 @@ toggleTheme();
 			height: 24px;
 			display: block;
 			color: currentColor;
-			transition: var(--transition);
+			transition: all 0.3s ease;
 		}
 
 		.theme-toggle .sun-icon svg {
@@ -231,7 +411,7 @@ toggleTheme();
 			color: #4cc9f0;
 			}/* Light theme toggle adjustments */:root[data-theme="light"] .theme-toggle
 			{
-				border-color: var(--text-dim);
+				border-color: var(--secondary);
 			}
 	</style>
 {% endblock %}

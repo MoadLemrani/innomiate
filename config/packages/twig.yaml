@@ -1,5 +1,7 @@
+# config/packages/twig.yaml
 twig:
     file_name_pattern: '*.twig'
+    # Remove the manual globals, let the bundle handle them
 
 when@test:
     twig:
