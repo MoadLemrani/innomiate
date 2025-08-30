@@ -106,3 +106,43 @@ Future contributions may follow:
 - Symfony/PSR-12 coding style
 
 ---
+
+##  Project Structure
+
+innomiate/
+├── assets/
+├── bin/
+├── config/
+├── migrations/
+├── public/
+├── src/
+│   ├── Controller/
+│   ├── Entity/
+│   ├── Enum/
+│   ├── Form/
+│   ├── Kernel.php
+│   └── Repository/
+├── Security/
+├── templates/
+│   ├── participant/
+│   ├── profil/
+│   ├── registration/
+│   ├── security/
+│   ├── super_admin/
+│   ├── team/
+│   └── base.html.twig
+├── tests/
+├── translations/
+├── var/
+├── vendor/
+├── .env
+├── .env.dev
+├── .gitignore
+├── compose.override.yaml
+├── compose.yaml
+├── composer.json
+├── composer.lock
+├── importmap.php
+├── phpunit.xml
+├── README.md
+└── symfony.lock
