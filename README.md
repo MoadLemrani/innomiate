@@ -107,23 +107,24 @@ Future contributions may follow:
 
 ---
 
-##  Project Structure
-
+##  
+Project Structure
+-----------------
 innomiate/
-├── assets/
-├── bin/
-├── config/
-├── migrations/
-├── public/
-├── src/
-│   ├── Controller/
-│   ├── Entity/
-│   ├── Enum/
-│   ├── Form/
-│   ├── Kernel.php
-│   └── Repository/
-├── Security/
-├── templates/
+├── assets/                # Front-end assets (JS, CSS, images)
+├── bin/                   # Symfony console commands
+├── config/                # Configuration files
+├── migrations/            # Database migrations
+├── public/                # Public web directory (front controller, public assets)
+├── src/                   # Main PHP source code
+│   ├── Controller/        # Controllers
+│   ├── Entity/            # Database entities
+│   ├── Enum/              # Enums
+│   ├── Form/              # Symfony forms
+│   ├── Kernel.php         # Symfony Kernel
+│   └── Repository/        # Doctrine repositories
+├── Security/              # Security-related classes
+├── templates/             # Twig templates
 │   ├── participant/
 │   ├── profil/
 │   ├── registration/
@@ -131,18 +132,18 @@ innomiate/
 │   ├── super_admin/
 │   ├── team/
 │   └── base.html.twig
-├── tests/
-├── translations/
-├── var/
-├── vendor/
-├── .env
-├── .env.dev
-├── .gitignore
-├── compose.override.yaml
-├── compose.yaml
-├── composer.json
-├── composer.lock
-├── importmap.php
-├── phpunit.xml
-├── README.md
-└── symfony.lock
+├── tests/                 # PHPUnit tests
+├── translations/          # Translation files
+├── var/                   # Cache, logs, temporary files
+├── vendor/                # Composer dependencies
+├── .env                   # Environment variables
+├── .env.dev               # Development environment variables
+├── .gitignore             # Git ignore file
+├── compose.override.yaml  # Docker override (optional)
+├── compose.yaml           # Docker configuration (optional)
+├── composer.json          # Composer dependencies definition
+├── composer.lock          # Composer lock file
+├── importmap.php          # JS importmap configuration (optional)
+├── phpunit.xml            # PHPUnit configuration
+├── README.md              # Project documentation
+└── symfony.lock           # Symfony lock file
