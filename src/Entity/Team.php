@@ -29,8 +29,9 @@ class Team
     #[ORM\JoinColumn(nullable: false)]
     private ?Participant $leaderParticipant = null;
 
-    #[ORM\Column(type: 'datetime')]
-    private ?\DateTimeInterface $createdAt = null;
+    // FIXED: Use datetime_immutable type for DateTimeImmutable objects
+    #[ORM\Column(type: 'datetime_immutable')]
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\OneToMany(mappedBy: 'team', targetEntity: Participant::class)]
     private Collection $members;
@@ -46,35 +47,87 @@ class Team
     }
 
     // Getters and Setters
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int 
+    { 
+        return $this->id; 
+    }
 
-    public function getteamCode(): ?string { return $this->teamCode; }
-    public function setteamCode(string $teamCode): self { $this->teamCode = $teamCode; return $this; }
+    // FIXED: Proper method names with capital T
+    public function getTeamCode(): ?string 
+    { 
+        return $this->teamCode; 
+    }
+    
+    public function setTeamCode(string $teamCode): self 
+    { 
+        $this->teamCode = $teamCode; 
+        return $this; 
+    }
 
-    public function getName(): ?string { return $this->name; }
-    public function setName(string $name): self { $this->name = $name; return $this; }
+    public function getName(): ?string 
+    { 
+        return $this->name; 
+    }
+    
+    public function setName(string $name): self 
+    { 
+        $this->name = $name; 
+        return $this; 
+    }
 
-    public function getCompetition(): ?Competition { return $this->competition; }
-    public function setCompetition(?Competition $competition): self { $this->competition = $competition; return $this; }
+    public function getCompetition(): ?Competition 
+    { 
+        return $this->competition; 
+    }
+    
+    public function setCompetition(?Competition $competition): self 
+    { 
+        $this->competition = $competition; 
+        return $this; 
+    }
 
-    public function getLeaderParticipant(): ?Participant { return $this->leaderParticipant; }
-    public function setLeaderParticipant(?Participant $leaderParticipant): self { $this->leaderParticipant = $leaderParticipant; return $this; }
+    public function getLeaderParticipant(): ?Participant 
+    { 
+        return $this->leaderParticipant; 
+    }
+    
+    public function setLeaderParticipant(?Participant $leaderParticipant): self 
+    { 
+        $this->leaderParticipant = $leaderParticipant; 
+        return $this; 
+    }
 
-    public function getCreatedAt(): ?\DateTimeInterface { return $this->createdAt; }
-    public function setCreatedAt(\DateTimeInterface $createdAt): self { $this->createdAt = $createdAt; return $this; }
+    // FIXED: Return type should be DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeImmutable 
+    { 
+        return $this->createdAt; 
+    }
+    
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self 
+    { 
+        $this->createdAt = $createdAt; 
+        return $this; 
+    }
 
     /**
      * @return Collection<int, Participant>
      */
-    public function getMembers(): Collection { return $this->members; }
-    public function addMember(Participant $member): self {
+    public function getMembers(): Collection 
+    { 
+        return $this->members; 
+    }
+    
+    public function addMember(Participant $member): self 
+    {
         if (!$this->members->contains($member)) {
             $this->members->add($member);
             $member->setTeam($this);
         }
         return $this;
     }
-    public function removeMember(Participant $member): self {
+    
+    public function removeMember(Participant $member): self 
+    {
         if ($this->members->removeElement($member)) {
             if ($member->getTeam() === $this) {
                 $member->setTeam(null);
@@ -86,15 +139,22 @@ class Team
     /**
      * @return Collection<int, Invitation>
      */
-    public function getInvitations(): Collection { return $this->invitations; }
-    public function addInvitation(Invitation $invitation): self {
+    public function getInvitations(): Collection 
+    { 
+        return $this->invitations; 
+    }
+    
+    public function addInvitation(Invitation $invitation): self 
+    {
         if (!$this->invitations->contains($invitation)) {
             $this->invitations->add($invitation);
             $invitation->setTeam($this);
         }
         return $this;
     }
-    public function removeInvitation(Invitation $invitation): self {
+    
+    public function removeInvitation(Invitation $invitation): self 
+    {
         if ($this->invitations->removeElement($invitation)) {
             if ($invitation->getTeam() === $this) {
                 $invitation->setTeam(null);

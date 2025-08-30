@@ -1,0 +1,2348 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Mes pitchs
+{% endblock %}
+
+{% block body %}
+	<style>
+	/* =================================
+           CSS VARIABLES & ROOT SETTINGS
+           ================================= */
+	:root {
+		--primary-red: #ff3e5f;
+		--primary-green: #2ecc71;
+		--primary-blue: #667eea;
+		--primary-purple: #764ba2;
+		--primary-white: #ffffff;
+		--dark-bg: #0f1621;
+		--glass-bg: rgba(255, 255, 255, 0.05);
+		--text-light: #f0f0f0;
+		--text-dim: #b0b0b0;
+		--shadow-neon-red: 0 0 10px rgba(255, 62, 95, 0.3);
+		--shadow-neon-green: 0 0 10px rgba(46, 204, 113, 0.3);
+		--shadow-neon-blue: 0 0 10px rgba(102, 126, 234, 0.3);
+		--shadow-color: rgba(0, 0, 0, 0.3);
+		--card-background: rgba(255, 255, 255, 0.1);
+		--pitch-card-background: #1a2332;
+		--transition: all 0.3s ease;
+		--content-bg: rgba(255, 255, 255, 0.05);
+		--contact-bg: rgba(46, 204, 113, 0.08);
+		--liked-red: #e74c3c;
+	}
+
+	:root[data-theme="light"] {
+		--primary-red: #e74c3c;
+		--primary-green: #27ae60;
+		--primary-blue: #2980b9;
+		--primary-purple: #8e44ad;
+		--primary-white: #2c3e50;
+		--dark-bg: #f8f9fa;
+		--glass-bg: rgba(255, 255, 255, 0.95);
+		--text-light: #2c3e50;
+		--text-dim: #7f8c8d;
+		--shadow-neon-red: 0 0 10px rgba(231, 76, 60, 0.2);
+		--shadow-neon-green: 0 0 10px rgba(39, 174, 96, 0.2);
+		--shadow-neon-blue: 0 0 10px rgba(41, 128, 185, 0.2);
+		--shadow-color: rgba(0, 0, 0, 0.1);
+		--card-background: rgba(255, 255, 255, 0.95);
+		--pitch-card-background: #ffffff;
+		--content-bg: rgba(0, 0, 0, 0.02);
+		--contact-bg: rgba(27, 174, 96, 0.08);
+		--liked-red: #c0392b;
+	}
+
+	/* =================================
+           GLOBAL STYLES
+           ================================= */
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+
+	body {
+		background: var(--dark-bg);
+		color: var(--text-light);
+		min-height: 100vh;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		transition: var(--transition);
+		overflow-x: hidden;
+	}
+
+	/* Enhanced background effect */
+	body::before {
+		content: '';
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+		            radial-gradient(circle at 80% 20%, rgba(255, 62, 95, 0.05) 0%, transparent 50%),
+		            radial-gradient(circle at 40% 80%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
+		pointer-events: none;
+		z-index: -1;
+	}
+
+	/* =================================
+           ENHANCED ANIMATIONS & KEYFRAMES
+           ================================= */
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+			transform: translateY(-5px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes floatIn {
+		from {
+			transform: translateY(20px) scale(0.98);
+			opacity: 0;
+		}
+		to {
+			transform: translateY(0) scale(1);
+			opacity: 1;
+		}
+	}
+
+	@keyframes heartPop {
+		0% {
+			transform: scale(1);
+		}
+		15% {
+			transform: scale(1.25);
+		}
+		30% {
+			transform: scale(1.15);
+		}
+		45% {
+			transform: scale(1.3);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	@keyframes likeAnimation {
+		0% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.3);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	@keyframes slideInFromLeft {
+		from {
+			opacity: 0;
+			transform: translateX(-30px);
+		}
+		to {
+			opacity: 1;
+			transform: translateX(0);
+		}
+	}
+
+	@keyframes slideInDown {
+		from {
+			opacity: 0;
+			transform: translateY(-20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	/* =================================
+           ENHANCED THEME TOGGLE COMPONENT
+           ================================= */
+	.theme-toggle {
+		position: fixed;
+		top: 20px;
+		right: 20px;
+		z-index: 999;
+		background: var(--card-background);
+		backdrop-filter: blur(15px);
+		border: 2px solid var(--text-light);
+		border-radius: 50px;
+		padding: 8px;
+		cursor: pointer;
+		box-shadow: 0 4px 15px var(--shadow-color);
+		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+	}
+
+	.theme-toggle:hover {
+		transform: scale(1.1) rotate(5deg);
+		box-shadow: 0 8px 25px var(--shadow-color);
+		border-color: var(--text-light);
+	}
+
+	.theme-toggle .sun-icon,
+	.theme-toggle .moon-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.theme-toggle svg {
+		width: 20px;
+		height: 20px;
+		display: block;
+		color: currentColor;
+		transition: all 0.4s ease;
+	}
+
+	.theme-toggle .sun-icon svg {
+		color: #ffa500;
+		filter: drop-shadow(0 0 4px #ffa500);
+	}
+
+	.theme-toggle .moon-icon svg {
+		color: #4cc9f0;
+		filter: drop-shadow(0 0 4px #4cc9f0);
+	}
+
+	/* =================================
+           ENHANCED SIDEBAR TOGGLE BUTTON
+           ================================= */
+	.sidebar-toggle {
+		position: fixed;
+		top: 20px;
+		left: 20px;
+		z-index: 1000;
+		background: var(--card-background);
+		backdrop-filter: blur(15px);
+		border: 2px solid var(--text-light);
+		border-radius: 50px;
+		padding: 8px;
+		cursor: pointer;
+		box-shadow: 0 4px 15px var(--shadow-color);
+		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+	}
+
+	.sidebar-toggle:hover {
+		transform: scale(1.1);
+		box-shadow: 0 8px 25px var(--shadow-color);
+		border-color: var(--text-light);
+	}
+
+	.sidebar-toggle svg {
+		width: 20px;
+		height: 20px;
+		color: var(--text-light);
+		transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	/* =================================
+           ENHANCED DASHBOARD LAYOUT
+           ================================= */
+	.dashboard-container {
+		display: flex;
+		min-height: 100vh;
+		position: relative;
+	}
+
+	.sidebar {
+		width: 80px;
+		background: rgba(15, 22, 33, 0.9);
+		backdrop-filter: blur(20px);
+		padding: 20px 15px;
+		border-right: 1px solid rgba(255, 255, 255, 0.1);
+		transition: all 0.4s ease;
+		position: fixed;
+		height: 100vh;
+		z-index: 100;
+		overflow: hidden;
+	}
+
+	:root[data-theme="light"] .sidebar {
+		background: rgba(248, 249, 250, 0.95);
+		border-right: 1px solid rgba(0, 0, 0, 0.1);
+	}
+
+	.sidebar::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 1px;
+		height: 100%;
+		background: linear-gradient(
+			to bottom,
+			transparent,
+			var(--primary-green),
+			var(--primary-blue),
+			transparent
+		);
+		opacity: 0.3;
+	}
+
+	.sidebar-title,
+	.sidebar .nav-text {
+		display: none;
+		opacity: 0;
+		transition: all 0.3s ease;
+	}
+
+	.sidebar-header {
+		display: flex;
+		align-items: center;
+		margin-bottom: 30px;
+		padding: 0;
+		justify-content: center;
+		transition: all 0.3s ease;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.sidebar-header:hover {
+		text-decoration: none;
+		transform: scale(1.05);
+	}
+
+	.sidebar-logo {
+		font-size: 24px;
+		margin-right: 10px;
+		background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+	}
+
+	.sidebar-title {
+		font-size: 20px;
+		font-weight: 700;
+		background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		transition: all 0.3s ease;
+	}
+
+	.sidebar-img {
+		width: 64px;
+		height: 64px;
+		transition: all 0.3s ease;
+	}
+
+	.nav-menu {
+		list-style: none;
+	}
+
+	.nav-item {
+		margin-bottom: 10px;
+		text-align: center;
+	}
+
+	.nav-link {
+		display: flex;
+		align-items: center;
+		padding: 12px;
+		color: var(--text-dim);
+		text-decoration: none;
+		border-radius: 12px;
+		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+		justify-content: center;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.nav-link::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: -100%;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(
+			90deg,
+			transparent,
+			rgba(255, 255, 255, 0.1),
+			transparent
+		);
+		transition: left 0.6s ease;
+	}
+
+	.nav-link:hover::before {
+		left: 100%;
+	}
+
+	.nav-link:hover,
+	.nav-link.active {
+		background: rgba(255, 255, 255, 0.1);
+		color: var(--text-light);
+		transform: translateX(4px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	}
+
+	.nav-link.active {
+		border-left: 3px solid var(--primary-green);
+		background: linear-gradient(135deg, 
+			rgba(46, 204, 113, 0.2) 0%, 
+			rgba(102, 126, 234, 0.2) 100%);
+		box-shadow: var(--shadow-neon-green);
+	}
+
+	.nav-icon {
+		margin-right: 0;
+		font-size: clamp(1.2rem, 3vw, 1.5rem);
+		width: clamp(32px, 4vw, 32px);
+		height: clamp(32px, 4vw, 32px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.3s ease;
+	}
+
+	.nav-link:hover .nav-icon {
+		transform: scale(1.1);
+	}
+
+	.main-content {
+		flex: 1;
+		padding: clamp(20px, 3vw, 30px);
+		background: rgba(15, 22, 33, 0.5);
+		margin-left: 70px;
+		transition: margin-left 0.3s ease;
+		animation: fadeIn 0.6s ease-out;
+	}
+
+	:root[data-theme="light"] .main-content {
+		background: rgba(248, 249, 250, 0.7);
+	}
+
+	.page-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 30px;
+		animation: slideInFromLeft 0.8s ease-out;
+	}
+
+	.page-title {
+		font-size: clamp(1.5rem, 4vw, 2rem);
+		font-weight: 600;
+		background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-blue) 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+	}
+
+	.user-profile {
+		display: flex;
+		align-items: center;
+		text-decoration: none;
+		color: inherit;
+		background: var(--card-background);
+		backdrop-filter: blur(15px);
+		padding: 8px 12px;
+		border-radius: 25px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		transition: all 0.4s ease;
+	}
+
+	.user-profile:hover {
+		text-decoration: none;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 20px var(--shadow-color);
+		border-color: rgba(255, 255, 255, 0.2);
+	}
+
+	.user-avatar {
+		width: clamp(30px, 6vw, 40px);
+		height: clamp(30px, 6vw, 40px);
+		border-radius: 50%;
+		background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-right: 10px;
+		color: white;
+		font-weight: 600;
+		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+		transition: all 0.3s ease;
+		font-size: clamp(0.8rem, 2vw, 1rem);
+	}
+
+	.user-name {
+		font-weight: 500;
+		white-space: nowrap;
+	}
+
+	/* Enhanced Glass Card Base */
+	.glass-card {
+		background: var(--card-background);
+		backdrop-filter: blur(15px);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 20px;
+		box-shadow: 0 8px 32px var(--shadow-color);
+		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+		position: relative;
+		overflow: hidden;
+	}
+
+	.glass-card::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: -100%;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(
+			90deg,
+			transparent,
+			rgba(255, 255, 255, 0.1),
+			transparent
+		);
+		transition: left 0.8s ease;
+	}
+
+	.glass-card:hover::before {
+		left: 100%;
+	}
+
+	.glass-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 16px 40px var(--shadow-color);
+		border-color: rgba(255, 255, 255, 0.2);
+	}
+
+	:root[data-theme="light"] .glass-card {
+		border: 1px solid rgba(0, 0, 0, 0.1);
+	}
+
+	/* Flash Messages */
+	.flash-messages {
+		margin-bottom: 30px;
+		margin-top: 20px;
+		max-width: calc(100% - 40px);
+		animation: slideInDown 0.6s ease-out;
+	}
+
+	.flash-info,
+	.flash-success,
+	.flash-error,
+	.flash-warning {
+		padding: 12px 16px;
+		margin-bottom: 15px;
+		border-radius: 8px;
+		font-size: 14px;
+		animation: fadeIn 0.3s ease-in-out;
+		text-align: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		border: 1px solid;
+		max-width: 100%;
+		box-sizing: border-box;
+		position: relative;
+		backdrop-filter: blur(10px);
+	}
+
+	.flash-info {
+		background: rgba(52, 152, 219, 0.1);
+		border-color: var(--primary-blue);
+		color: var(--primary-blue);
+		box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+	}
+
+	.flash-success {
+		background: rgba(46, 204, 113, 0.1);
+		border-color: var(--primary-green);
+		color: var(--primary-green);
+		box-shadow: var(--shadow-neon-green);
+	}
+
+	.flash-error {
+		background: rgba(255, 62, 95, 0.1);
+		border-color: var(--primary-red);
+		color: var(--primary-red);
+		box-shadow: var(--shadow-neon-red);
+	}
+
+	.flash-warning {
+		background: rgba(255, 193, 7, 0.1);
+		border-color: #ffc107;
+		color: #ffc107;
+		box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+	}
+
+	.flash-close {
+		background: none;
+		border: none;
+		color: currentColor;
+		opacity: 0.7;
+		cursor: pointer;
+		font-size: 20px;
+		font-weight: 600;
+		margin-left: auto;
+		padding: 2px;
+		width: 24px;
+		height: 24px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		transition: all 0.3s ease;
+		position: absolute;
+		top: 50%;
+		right: 12px;
+		transform: translateY(-50%);
+	}
+
+	.flash-close:hover {
+		opacity: 1;
+		background: rgba(255, 255, 255, 0.1);
+		transform: translateY(-50%) scale(1.1);
+	}
+
+	.flash-close:active {
+		transform: translateY(-50%) scale(0.95);
+	}
+    /* =================================
+	   NO PITCHES STYLING
+	   ================================= */
+	.no-pitches {
+		grid-column: 1 / -1;
+		text-align: center;
+		padding: 40px 20px;
+		color: var(--text-dim);
+		position: relative;
+		overflow: hidden;
+	}
+	.no-pitches p {
+		font-size: 18px;
+		margin-bottom: 30px;
+		position: relative;
+		z-index: 2;
+	}
+	/* =================================
+           REDESIGNED PITCH CARD
+           ================================= */
+	.pitches-list {
+		display: flex;
+		flex-direction: column;
+		gap: clamp(16px, 3vw, 24px);
+		max-width: 800px;
+		margin: 0 auto;
+		width: 100%;
+	}
+
+	.pitch-item {
+		display: flex;
+		flex-direction: column;
+		padding: clamp(16px, 3vw, 24px);
+		border-radius: 16px;
+		background: var(--pitch-card-background);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+		animation: floatIn 0.6s ease-out;
+		position: relative;
+		max-width: 100%;
+		overflow: hidden;
+	}
+
+	/* User's own pitch styling */
+	.pitch-item.own-pitch {
+		border: 2px solid var(--primary-green);
+		background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(102, 126, 234, 0.05) 100%);
+		box-shadow: var(--shadow-neon-green);
+	}
+
+	.pitch-item.own-pitch::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 3px;
+		background: linear-gradient(90deg, var(--primary-green), var(--primary-blue));
+		border-radius: 16px 16px 0 0;
+	}
+
+	:root[data-theme="light"] .pitch-item {
+		border: 1px solid rgba(0, 0, 0, 0.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	}
+
+	:root[data-theme="light"] .pitch-item.own-pitch {
+		border: 2px solid var(--primary-green);
+		background: linear-gradient(135deg, rgba(46, 204, 113, 0.08) 0%, rgba(102, 126, 234, 0.03) 100%);
+	}
+
+	.pitch-item:nth-child(even) {
+		animation-delay: 0.1s;
+	}
+
+	.pitch-item:nth-child(odd) {
+		animation-delay: 0.2s;
+	}
+
+	.pitch-item:hover {
+		transform: translateY(-6px);
+		box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+		border-color: rgba(46, 204, 113, 0.3);
+	}
+
+	:root[data-theme="light"] .pitch-item:hover {
+		box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+	}
+
+	.pitch-header {
+		display: flex;
+		align-items: center;
+		gap: clamp(8px, 2vw, 12px);
+		margin-bottom: clamp(16px, 3vw, 20px);
+		flex-wrap: wrap;
+		max-width: 100%;
+	}
+
+	.pitch-avatar {
+		width: clamp(40px, 8vw, 50px);
+		height: clamp(40px, 8vw, 50px);
+		border-radius: 50%;
+		background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: white;
+		font-weight: 600;
+		font-size: clamp(0.9rem, 3vw, 1.1rem);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+		transition: all 0.3s ease;
+		flex-shrink: 0;
+	}
+
+	.pitch-item:hover .pitch-avatar {
+		transform: scale(1.05);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+	}
+
+	.pitch-user-info {
+		flex: 1;
+		min-width: 0;
+		max-width: calc(100% - 60px);
+	}
+
+	.sender-name {
+		font-weight: 600;
+		font-size: clamp(1rem, 3vw, 1.1rem);
+		color: var(--text-light);
+		display: block;
+		margin-bottom: 4px;
+		transition: all 0.3s ease;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		hyphens: auto;
+		max-width: 100%;
+	}
+
+	.pitch-competition {
+		font-size: clamp(0.75rem, 2vw, 0.9rem);
+		color: var(--primary-green);
+		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		hyphens: auto;
+		max-width: 100%;
+	}
+
+	/* Own pitch indicator */
+	.own-pitch-indicator {
+		background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-blue) 100%);
+		color: white;
+		font-size: clamp(0.7rem, 2vw, 0.75rem);
+		font-weight: 600;
+		padding: 4px 12px;
+		border-radius: 20px;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+		margin-left: auto;
+		flex-shrink: 0;
+	}
+
+	/* Options dropdown */
+	.pitch-options {
+		position: relative;
+		margin-left: auto;
+		flex-shrink: 0;
+	}
+
+	.options-button {
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 8px;
+		border-radius: 50%;
+		color: var(--text-dim);
+		transition: all 0.3s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+	}
+
+	.options-button:hover {
+		background: rgba(255, 255, 255, 0.1);
+		color: var(--text-light);
+		transform: scale(1.1);
+	}
+
+	.options-button svg {
+		width: 18px;
+		height: 18px;
+	}
+
+	.options-menu {
+		position: absolute;
+		top: 100%;
+		right: 0;
+		background: var(--card-background);
+		backdrop-filter: blur(15px);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		box-shadow: 0 8px 32px var(--shadow-color);
+		z-index: 1000;
+		min-width: 140px;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-10px) scale(0.95);
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.options-menu.active {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0) scale(1);
+	}
+
+	/* Update options menu styling */
+    .options-menu a,
+    .options-menu button {
+        display: block;
+        padding: 12px 16px;
+        color: var(--text-light);
+        text-decoration: none;
+        font-size: clamp(0.8rem, 2vw, 0.9rem);
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        margin: 4px;
+        position: relative;
+        background: none;
+        border: none;
+        text-align: left;
+        width: calc(100% - 8px);
+        cursor: pointer;
+        font-family: inherit;
+    }
+    
+    .options-menu a:hover,
+    .options-menu button:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--primary-green);
+        transform: translateX(2px);
+    }
+    
+    .options-menu button:first-child {
+        border-radius: 8px 8px 4px 4px;
+    }
+    
+    .options-menu button:last-child {
+        border-radius: 4px 4px 8px 8px;
+    }
+    
+    /* Confirmation modal styles */
+    .confirmation-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .confirmation-modal.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .confirmation-content {
+        background: var(--card-background);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 30px;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 20px 40px var(--shadow-color);
+        transform: scale(0.9) translateY(20px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .confirmation-modal.active .confirmation-content {
+        transform: scale(1) translateY(0);
+    }
+    
+    .confirmation-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-light);
+        margin-bottom: 15px;
+        text-align: center;
+    }
+    
+    .confirmation-message {
+        color: var(--text-dim);
+        margin-bottom: 25px;
+        text-align: center;
+        line-height: 1.5;
+    }
+    
+    .confirmation-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+    
+    .confirm-btn,
+    .cancel-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        min-width: 80px;
+    }
+    
+    .confirm-btn {
+        background: linear-gradient(135deg, var(--primary-red) 0%, #c0392b 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(255, 62, 95, 0.3);
+    }
+    
+    .confirm-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(255, 62, 95, 0.4);
+    }
+    
+    .cancel-btn {
+        background: var(--glass-bg);
+        color: var(--text-light);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .cancel-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+    }
+
+	.pitch-content {
+		display: flex;
+		flex-direction: column;
+		gap: clamp(16px, 3vw, 20px);
+		width: 100%;
+		max-width: 100%;
+		margin-bottom: clamp(16px, 3vw, 20px);
+	}
+
+	.pitch-content-section {
+		background: var(--content-bg);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 12px;
+		padding: clamp(16px, 3vw, 20px);
+		position: relative;
+		max-width: 100%;
+		overflow: hidden;
+	}
+
+	.content-label {
+		font-size: clamp(0.7rem, 2vw, 0.75rem);
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		color: var(--primary-blue);
+		margin-bottom: 12px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+		max-width: 100%;
+	}
+
+	.content-label::before {
+		content: '💡';
+		font-size: 14px;
+	}
+
+	.pitch-message {
+		font-size: clamp(0.9rem, 2.5vw, 1rem);
+		color: var(--text-light);
+		line-height: 1.6;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		word-break: break-word;
+		hyphens: auto;
+		position: relative;
+		max-width: 100%;
+		white-space: pre-wrap;
+	}
+
+	.pitch-message.truncated {
+		display: -webkit-box;
+		-webkit-line-clamp: 4;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		white-space: normal;
+	}
+
+	.show-more-btn {
+		background: none;
+		border: none;
+		color: var(--primary-green);
+		cursor: pointer;
+		font-size: clamp(0.8rem, 2vw, 0.9rem);
+		font-weight: 600;
+		padding: 8px 0 0;
+		margin-top: 12px;
+		transition: all 0.3s ease;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		display: inline-block;
+		width: auto;
+	}
+
+	.show-more-btn:hover {
+		color: var(--primary-blue);
+		transform: translateX(2px);
+	}
+
+	.pitch-contact-section {
+		background: var(--contact-bg);
+		border: 1px solid rgba(46, 204, 113, 0.2);
+		border-radius: 12px;
+		padding: clamp(16px, 3vw, 20px);
+		position: relative;
+		max-width: 100%;
+		overflow: hidden;
+	}
+
+	.contact-label {
+		font-size: clamp(0.7rem, 2vw, 0.75rem);
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		color: var(--primary-green);
+		margin-bottom: 12px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+		max-width: 100%;
+	}
+
+	.contact-label::before {
+		content: '📞';
+		font-size: 14px;
+	}
+
+	.pitch-contact {
+		font-size: clamp(0.8rem, 2vw, 0.9rem);
+		color: var(--text-light);
+		line-height: 1.5;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		word-break: break-word;
+		hyphens: auto;
+		font-family: 'Courier New', monospace;
+		background: rgba(255, 255, 255, 0.05);
+		padding: 12px 16px;
+		border-radius: 8px;
+		border-left: 3px solid var(--primary-green);
+		max-width: 100%;
+		white-space: pre-wrap;
+	}
+
+	.pitch-footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-top: clamp(16px, 3vw, 20px);
+		padding-top: clamp(12px, 2vw, 16px);
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		flex-wrap: wrap;
+		gap: 12px;
+		max-width: 100%;
+	}
+
+	.pitch-meta {
+		font-size: clamp(0.75rem, 2vw, 0.8rem);
+		color: var(--text-dim);
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+		max-width: 100%;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+	}
+
+	.pitch-meta::before {
+		content: '📅';
+	}
+
+	/* Updated CSS for like button tooltip - behaves like dev tooltip */
+
+    /* Like Button Container */
+    .pitch-like-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    /* Like Button - Updated to match dev tooltip behavior */
+    .like-btn {
+        background: none;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: visible;
+        padding: 8px;
+        min-width: 40px;
+        min-height: 40px;
+    }
+    
+    .like-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 62, 95, 0.2);
+        border-radius: 50%;
+        transition: all 0.4s ease;
+        transform: translate(-50%, -50%);
+        z-index: 0;
+    }
+    
+    .like-btn:hover::before {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .like-btn:hover {
+        transform: scale(1.1);
+    }
+    
+    .like-btn.liked {
+        animation: heartPop 0.6s ease-out;
+    }
+    
+    .heart-icon {
+        width: clamp(20px, 4vw, 24px);
+        height: clamp(20px, 4vw, 24px);
+        transition: all 0.3s ease;
+        z-index: 1;
+        position: relative;
+        color: var(--text-dim);
+    }
+    
+    .like-btn.liked .heart-icon {
+        color: var(--liked-red);
+        fill: var(--liked-red);
+        filter: drop-shadow(0 2px 4px rgba(231, 76, 60, 0.3));
+    }
+    
+    .like-btn:hover .heart-icon {
+        transform: scale(1.1);
+    }
+    
+    .like-btn.liked .heart-icon {
+        animation: likeAnimation 0.6s ease-out;
+    }
+    
+    /* Tooltip for like button - matching dev tooltip positioning */
+    .tooltip-like {
+        position: absolute;
+        top: 50%;
+        left: -120px;
+        transform: translateY(-50%);
+        background: var(--card-background);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: clamp(0.7rem, 1.5vw, 0.75rem);
+        color: var(--text-light);
+        white-space: nowrap;
+        z-index: 1001;
+        box-shadow: 0 2px 8px var(--shadow-color);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        pointer-events: none;
+    }
+    
+    .tooltip-like.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .tooltip-like::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: -6px;
+        transform: translateY(-50%);
+        border: 6px solid transparent;
+        border-left-color: var(--card-background);
+    }
+
+	/* =================================
+           SIDEBAR OVERLAY
+           ================================= */
+	.sidebar-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 99;
+		opacity: 0;
+		visibility: hidden;
+		transition: all 0.3s ease;
+	}
+
+	.sidebar-overlay.active {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	/* Header Actions Container */
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    
+    /* Create Pitch Button */
+    .create-pitch-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-blue) 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    
+    .create-pitch-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+        );
+        transition: left 0.6s ease;
+    }
+    
+    .create-pitch-btn:hover::before {
+        left: 100%;
+    }
+    
+    .create-pitch-btn:hover {
+        text-decoration: none;
+        color: white;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(46, 204, 113, 0.4);
+    }
+    
+    .create-pitch-btn:active {
+        transform: translateY(-1px) scale(1.01);
+    }
+    
+    .create-icon {
+        width: clamp(18px, 3vw, 20px);
+        height: clamp(18px, 3vw, 20px);
+        transition: all 0.3s ease;
+    }
+    
+    .create-pitch-btn:hover .create-icon {
+        transform: rotate(90deg) scale(1.1);
+    }
+    
+    .btn-text {
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+    
+    /* Light theme adjustments */
+    :root[data-theme="light"] .create-pitch-btn {
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.25);
+    }
+    
+    :root[data-theme="light"] .create-pitch-btn:hover {
+        box-shadow: 0 8px 25px rgba(46, 204, 113, 0.35);
+    }
+
+	/* Modal form styles */
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        color: var(--text-dim);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .modal-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-light);
+        transform: rotate(90deg);
+    }
+    
+    .modal-body {
+        margin-bottom: 25px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(44, 211, 66, 0.5);
+        border-radius: 8px;
+        color: var(--text-light);
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        resize: vertical;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+    }
+    
+    .form-text {
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        margin-top: 5px;
+    }
+    
+    /* Loading spinner */
+    .submit-loading {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s ease-in-out infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+	.input-error {
+        border: 1px solid red !important;
+    }
+        
+    /* =================================
+       RESPONSIVE
+    ================================= */
+	@media(max-width: 992px) {
+		.sidebar {
+			transform: translateX(-100%);
+			width: 250px;
+		}
+
+		.sidebar.mobile-open {
+			transform: translateX(0);
+		}
+
+		.sidebar-title,
+		.nav-text {
+			display: block !important;
+			opacity: 1 !important;
+		}
+
+		.sidebar-header {
+			justify-content: flex-start !important;
+		}
+
+		.nav-link {
+			justify-content: flex-start !important;
+			padding: 12px 15px !important;
+		}
+
+		.nav-icon {
+			margin-right: 10px !important;
+		}
+
+		.page-header {
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-actions {
+            width: 100%;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .create-pitch-btn {
+            padding: 10px 18px;
+            font-size: 14px;
+        }
+	}
+
+	@media(min-width: 993px) {
+		.sidebar-toggle {
+			display: none;
+		}
+	}
+
+	@media(max-width: 768px) {
+		.main-content {
+			padding: 20px 15px;
+			margin-left: 0;
+		}
+		.page-header {
+			flex-direction: column;
+			align-items: center;
+			gap: 1rem;
+		}
+		.flash-messages {
+			margin-top: 70px;
+			max-width: 100%;
+		}
+
+		.pitches-list {
+			max-width: 100%;
+		}
+
+		.pitch-item {
+			padding: 20px 16px;
+			max-width: 100%;
+		}
+
+		.pitch-header {
+			margin-bottom: 16px;
+		}
+
+		.pitch-avatar {
+			width: 45px;
+			height: 45px;
+			font-size: 16px;
+		}
+
+		.sender-name {
+			font-size: 16px;
+		}
+
+		.pitch-competition {
+			font-size: 13px;
+		}
+
+		.pitch-content-section,
+		.pitch-contact-section {
+			padding: 16px;
+		}
+
+		.pitch-message {
+			font-size: 15px;
+		}
+
+		.pitch-contact {
+			font-size: 14px;
+			padding: 10px 14px;
+		}
+
+		.pitch-footer {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 12px;
+		}
+
+		.tooltip {
+            left: auto;
+            right: 20px;
+            bottom: auto;
+            top: 50%;
+            transform: translateY(-50%) translateX(10px) scale(0.9);
+        }
+        
+        .tooltip.show {
+            transform: translateY(-50%) translateX(0) scale(1);
+        }
+        
+        .tooltip::after {
+            top: 50%;
+            left: -6px;
+            transform: translateY(-50%);
+            border: 6px solid transparent;
+            border-right-color: var(--card-background);
+            border-left: none;
+        }
+
+		.tooltip-like {
+            left: auto;
+            right: -100px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .tooltip-like::after {
+            right: auto;
+            left: -6px;
+            border-left: none;
+            border-right-color: var(--card-background);
+        }
+	}
+
+	@media(max-width: 480px) {
+		.main-content {
+			padding: 15px 10px;
+		}
+
+		.pitch-item {
+			margin: 0;
+			border-radius: 12px;
+			padding: 16px 12px;
+			max-width: 100%;
+		}
+
+		.pitches-list {
+			margin: 0;
+			max-width: 100%;
+		}
+
+		.pitch-content-section,
+		.pitch-contact-section {
+			padding: 12px;
+		}
+
+		.content-label,
+		.contact-label {
+			font-size: 11px;
+		}
+
+		.pitch-message {
+			font-size: 14px;
+		}
+
+		.pitch-contact {
+			font-size: 13px;
+			padding: 8px 12px;
+		}
+
+		.pitch-meta {
+			font-size: 12px;
+		}
+
+		.heart-icon {
+			width: 22px;
+			height: 22px;
+		}
+
+		.own-pitch-indicator {
+			font-size: 10px;
+			padding: 3px 8px;
+		}
+
+		.options-menu {
+			min-width: 120px;
+		}
+
+		.tooltip {
+			font-size: 11px;
+			padding: 5px 8px;
+		}
+
+		.tooltip-like {
+            right: -90px;
+            font-size: 10px;
+            padding: 3px 6px;
+        }
+		.header-actions {
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .create-pitch-btn {
+            padding: 10px 16px;
+            font-size: 13px;
+            width: auto;
+        }
+        
+        .btn-text {
+            display: inline;
+        }
+	}
+</style>
+
+<!-- Theme Toggle Button -->
+<button id="darkModeToggle" class="theme-toggle">
+	<span class="sun-icon">
+		<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="currentColor" class="size-6">
+			<path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z"/>
+		</svg>
+	</span>
+	<span class="moon-icon" style="display: none;">
+		<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="currentColor" class="size-6">
+			<path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69a.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z" clip-rule="evenodd"/>
+		</svg>
+	</span>
+</button>
+
+<!-- Sidebar Toggle Button -->
+<button id="sidebarToggle" class="sidebar-toggle">
+	<svg class="arrow-right-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+		<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+	</svg>
+	<svg class="arrow-left-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="display: none;">
+		<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
+	</svg>
+</button>
+
+<!-- Sidebar Overlay -->
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- Dashboard -->
+<div class="dashboard-container">
+	<!-- Sidebar -->
+	<div class="sidebar">
+		<div>
+			<a href="{{ path('app_dashboard') }}" class="sidebar-header" onclick="window.location=this.href; return false;">
+				<span class="sidebar-logo"><img src="/images/MIA_Logo.png" class="sidebar-img"/></span>
+				<span class="sidebar-title">INNOMIATE</span>
+			</a>
+		</div>
+		<ul class="nav-menu">
+			<li class="nav-item">
+				<a href="{{ path('app_dashboard') }}" class="nav-link" title="Tableau de bord" onclick="window.location=this.href; return false;">
+					<span class="nav-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="currentColor">
+							<path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z"/>
+							<path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z"/>
+						</svg>
+					</span>
+					<span class="nav-text">Tableau de bord</span>
+				</a>
+			</li>
+			<li class="nav-item">
+				<a href="{{ path('app_profil') }}" class="nav-link" title="Mon profil"onclick="window.location=this.href; return false;">
+					<span class="nav-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="currentColor">
+							<path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd"/>
+						</svg>
+					</span>
+					<span class="nav-text">Mon profil</span>
+				</a>
+			</li>
+			<li class="nav-item">
+				<a href="{{ path('team_invitations') }}" class="nav-link" title="Mes pitchs" onclick="window.location=this.href; return false;">
+					<span class="nav-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="currentColor">
+							<path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z"/>
+							<path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z"/>
+						</svg>
+					</span>
+					<span class="nav-text">Mes invitations</span>
+				</a>
+			</li>
+			<li class="nav-item">
+				<a href="{{ path('app_pitches') }}" class="nav-link active" title="Tableau des pitchs" onclick="window.location=this.href; return false;">
+					<span class="nav-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="currentColor">
+							<path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clip-rule="evenodd"/>
+						</svg>
+					</span>
+					<span class="nav-text">Tableau des pitchs</span>
+				</a>
+			</li>
+			<li class="nav-item">
+				<a href="{{ path('support') }}" class="nav-link" title="Aide" onclick="window.location=this.href; return false;">
+					<span class="nav-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"/>
+						</svg>
+					</span>
+					<span class="nav-text">Aide</span>
+				</a>
+			</li>
+			<li class="nav-item" style="margin-top: 50px;">
+				<a href="{{ path('app_logout') }}" class="nav-link" title="Déconnexion" onclick="window.location=this.href; return false;">
+					<span class="nav-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="currentColor">
+							<path fill-rule="evenodd" d="M7.5 3.75A1.5 1.5 0 006 5.25v13.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5V15a.75.75 0 011.5 0v3.75a3 3 0 01-3 3h-6a3 3 0 01-3-3V5.25a3 3 0 013-3h6a3 3 0 013 3V9A.75.75 0 0115 9V5.25a1.5 1.5 0 00-1.5-1.5h-6zm5.03 4.72a.75.75 0 010 1.06l-1.72 1.72h10.94a.75.75 0 010 1.5H10.81l1.72 1.72a.75.75 0 11-1.06 1.06l-3-3a.75.75 0 010-1.06l3-3a.75.75 0 011.06 0z" clip-rule="evenodd"/>
+						</svg>
+					</span>
+					<span class="nav-text">Déconnexion</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+
+	<!-- Main Content -->
+	<div class="main-content">
+		{# Flash Messages #}
+		<div class="flash-messages">
+			{% for message in app.flashes('info') %}
+				<div class="flash-info">
+					<span class="icon">ℹ️</span>
+					{{ message }}
+					<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+				</div>
+			{% endfor %}
+
+			{% for message in app.flashes('success') %}
+				<div class="flash-success">
+					<span class="icon">✅</span>
+					{{ message }}
+					<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+				</div>
+			{% endfor %}
+
+			{% for message in app.flashes('error') %}
+				<div class="flash-error">
+					<span class="icon">❌</span>
+					{{ message }}
+					<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+				</div>
+			{% endfor %}
+
+			{% for message in app.flashes('warning') %}
+		    	<div class="flash-warning">
+		    		<span class="icon">⚠️</span>
+		    		{{ message }}
+		    		<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+		    	</div>
+		    {% endfor %}
+		</div>
+
+		{# Updated Page Header with Create Pitch Button #}
+        <div class="page-header">
+            <h1 class="page-title">Tableau des pitchs</h1>
+            <div class="header-actions">
+                <a href="{{ path('team_pitch') }}" class="create-pitch-btn" onclick="window.location=this.href; return false;">
+                    <svg class="create-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="btn-text">Créer un pitch</span>
+                </a>
+                <a href="{{ path('app_profil') }}" class="user-profile" onclick="window.location=this.href; return false;">
+                    <div class="user-avatar">{{ app.user.firstName|first|upper }}</div>
+                    <span class="user-name">{{ app.user.firstName|title }}</span>
+                </a>
+            </div>
+        </div>
+        
+        {# If no pitchs, show tumbleweed #}
+		{% if pitchesCount == 0 %}
+			<div class="glass-card no-pitches">
+				<p>Aucun pitch pour le moment</p>
+				<div id="tumbleweed" style="width: 100%; height: 300px;"></div>
+			</div>
+		{% else %}
+			{# Updated Pitches List Section - User's pitches appear first #}
+            <div class="pitches-list">
+                {% set userPitches = [] %}
+                {% set otherPitches = [] %}
+                
+                {# Separate user's pitches from others #}
+                {% for pitch in pitches %}
+                    {% if pitch.participant.user.id == app.user.id %}
+                        {% set userPitches = userPitches|merge([pitch]) %}
+                    {% else %}
+                        {% set otherPitches = otherPitches|merge([pitch]) %}
+                    {% endif %}
+                {% endfor %}
+                
+                {# Display user's pitches first, then others #}
+                {% for pitch in userPitches|merge(otherPitches) %}
+                    <div class="pitch-item{% if pitch.participant.user.id == app.user.id %} own-pitch{% endif %}" data-pitch-id="{{ pitch.id }}">
+                        {# Pitch Header #}
+                        <div class="pitch-header">
+                            <div class="pitch-avatar">{{ pitch.participant.user.firstName|first|upper }}</div>
+                            <div class="pitch-user-info">
+                                <span class="sender-name">{{ pitch.participant.user.firstName }} {{ pitch.participant.user.lastName }}</span>
+                                <span class="pitch-competition">{{ pitch.competition.name }}</span>
+                            </div>
+                            
+                            {# Show indicator and options for user's own pitch #}
+                            {% if pitch.participant.user.id == app.user.id %}
+                                <span class="own-pitch-indicator">Mon Pitch</span>
+                                <div class="pitch-options">
+                                    <button class="options-button" onclick="toggleOptionsMenu(this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                            <path fill-rule="evenodd" d="M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm6 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm6 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                    <div class="options-menu">
+                                        <button type="button" onclick="openModifyModal({{ pitch.id }}, `{{ pitch.content|e('js') }}`, `{{ pitch.contactInfo|e('js') }}`, '{{ csrf_token('modify_pitch_' ~ pitch.id) }}');">
+                                            Modifier
+                                        </button>
+                                        <button type="button" onclick="confirmDelete({{ pitch.id }}, '{{ csrf_token('delete_pitch_' ~ pitch.id) }}')">
+                                            Supprimer
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                
+                        {# Pitch Content Section #}
+                        <div class="pitch-content">
+                            <div class="pitch-content-section">
+                                <div class="content-label">Contenu du Pitch</div>
+                                <div class="pitch-message{% if pitch.content|length > 200 %} truncated{% endif %}" data-full-text="{{ pitch.content }}">
+                                    {{ pitch.content }}
+                                </div>
+                                {% if pitch.content|length > 200 %}
+                                    <button class="show-more-btn" onclick="toggleContent(this)">Afficher plus</button>
+                                {% endif %}
+                            </div>
+                
+                            {# Contact Information Section #}
+                            {% if pitch.contactInfo %}
+                                <div class="pitch-contact-section">
+                                    <div class="contact-label">Informations de Contact</div>
+                                    <div class="pitch-contact">{{ pitch.contactInfo }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                
+                        {# Footer with Meta and Actions #}
+                        <div class="pitch-footer">
+                            <div class="pitch-meta">
+                                Publié le {{ pitch.createdAt|date('d/m/Y à H:i') }}
+                            </div>
+                            {# Like button with tooltip positioned like dev tooltip #}
+                            <div class="pitch-like-container">
+                                <button class="like-btn" onclick="toggleLike(this, {{ pitch.id }})" data-pitch-id="{{ pitch.id }}">
+                                    <svg class="heart-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                                    </svg>
+                                </button>
+                                <div class="tooltip-like">En développement</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+		{% endif %}
+	
+        {# Confirmation Modal #}
+        <div id="confirmationModal" class="confirmation-modal">
+            <div class="confirmation-content">
+                <h3 class="confirmation-title">Confirmer la suppression</h3>
+                <p class="confirmation-message">Êtes-vous sûr de vouloir supprimer ce pitch ? Cette action est irréversible.</p>
+                <div class="confirmation-actions">
+                    <button class="cancel-btn" onclick="closeConfirmation()">Annuler</button>
+                    <form id="deleteForm" method="POST" action="">
+                        <input type="hidden" name="_token" id="csrfToken" value="">
+                        <button type="submit" class="confirm-btn">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+		{# Modify Pitch Modal #}
+        <div id="modifyPitchModal" class="confirmation-modal">
+            <div class="confirmation-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h3 class="confirmation-title">Modifier votre pitch</h3>
+                    <button type="button" class="modal-close" onclick="closeModifyModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div id="modifySuccessMessage" class="flash-success" style="display: none; margin-bottom: 20px;">
+                        Votre pitch a été modifié avec succès !
+                    </div>
+                    <form id="modifyPitchForm">
+                        <input type="hidden" id="modifyPitchId" name="id" value="">
+                        <input type="hidden" id="modifyCsrfToken" name="_token" value="">
+                        
+                        <div class="form-group">
+                            <label for="modifyContent" class="form-label">Contenu du pitch</label>
+                            <textarea id="modifyContent" name="content" class="form-control" required></textarea>
+                            <div class="form-text">Décrivez votre projet en détail</div>
+                            <div id="contentError" class="flash-error" style="display: none; margin-top: 8px;"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="modifyContactInfo" class="form-label">Informations de contact</label>
+                            <textarea id="modifyContactInfo" name="contactInfo" class="form-control" required></textarea>
+                            <div class="form-text">Comment peut-on vous contacter?</div>
+                            <div id="contactInfoError" class="flash-error" style="display: none; margin-top: 8px;"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="confirmation-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModifyModal()">Annuler</button>
+                    <button type="button" class="confirm-btn" onclick="submitModifyForm()" style="background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-blue) 100%); box-shadow: 0 6px 20px rgba(84, 255, 62, 0.4);">
+                        <span id="submitSpinner" class="submit-loading" style="display: none;"></span>
+                        <span id="submitText">Modifier le pitch</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+	</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
+<script>
+// Dark Mode Toggle
+const themeToggle = document.getElementById('darkModeToggle');
+const sunIcon = themeToggle.querySelector('.sun-icon');
+const moonIcon = themeToggle.querySelector('.moon-icon');
+
+function updateToggleIcons(isDark) {
+	sunIcon.style.display = isDark ? 'inline-block' : 'none';
+	moonIcon.style.display = isDark ? 'none' : 'inline-block';
+}
+
+function toggleTheme() {
+	const currentTheme = document.documentElement.getAttribute('data-theme');
+	const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+	document.documentElement.setAttribute('data-theme', newTheme);
+	localStorage.setItem('theme', newTheme);
+	updateToggleIcons(newTheme === 'dark');
+}
+
+function initializeTheme() {
+	const savedTheme = localStorage.getItem('theme');
+	const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+	const defaultTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+	document.documentElement.setAttribute('data-theme', defaultTheme);
+	updateToggleIcons(defaultTheme === 'dark');
+	if (!savedTheme) localStorage.setItem('theme', defaultTheme);
+}
+
+initializeTheme();
+themeToggle.addEventListener('click', toggleTheme);
+
+// ====== SIDEBAR TOGGLE (Mobile Only) ======
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebar = document.querySelector('.sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const arrowRightIcon = sidebarToggle.querySelector('.arrow-right-icon');
+const arrowLeftIcon = sidebarToggle.querySelector('.arrow-left-icon');
+
+function isMobileView() {
+	return window.matchMedia('(max-width: 992px)').matches;
+}
+
+function openSidebar() {
+	sidebar.classList.add('mobile-open');
+	sidebarOverlay.classList.add('active');
+	document.body.style.overflow = 'hidden';
+	arrowRightIcon.style.display = 'none';
+	arrowLeftIcon.style.display = 'block';
+}
+
+function closeSidebar() {
+	sidebar.classList.remove('mobile-open');
+	sidebarOverlay.classList.remove('active');
+	document.body.style.overflow = '';
+	arrowRightIcon.style.display = 'block';
+	arrowLeftIcon.style.display = 'none';
+}
+
+sidebarToggle.addEventListener('click', (e) => {
+	e.stopPropagation();
+	if (isMobileView()) {
+		if (sidebar.classList.contains('mobile-open')) {
+			closeSidebar();
+		} else {
+			openSidebar();
+		}
+	}
+});
+
+sidebarOverlay.addEventListener('click', () => {
+	if (isMobileView()) closeSidebar();
+});
+
+document.addEventListener('keydown', (e) => {
+	if (e.key === 'Escape' && isMobileView() && sidebar.classList.contains('mobile-open')) {
+		closeSidebar();
+	}
+});
+
+window.addEventListener('resize', () => {
+	if (!isMobileView()) closeSidebar();
+});
+
+// Tumbleweed animation
+document.addEventListener('DOMContentLoaded', function() {
+	const tumbleweedContainer = document.getElementById('tumbleweed');
+	if (tumbleweedContainer) {
+		lottie.loadAnimation({
+			container: tumbleweedContainer,
+			renderer: 'svg',
+			loop: true,
+			autoplay: true,
+			path: '/images/Tumbleweed.json'
+		});
+	}
+});
+
+// ====== PITCH FUNCTIONALITY ======
+
+function toggleLike(button, pitchId) {
+    const isLiked = button.classList.contains('liked');
+    const heartIcon = button.querySelector('.heart-icon');
+    const tooltip = button.parentElement.querySelector('.tooltip-like');
+    
+    // Show tooltip like dev tooltip behavior
+    tooltip.classList.add('show');
+    
+    // Hide tooltip after 2 seconds (same as dev tooltip)
+    setTimeout(() => {
+        tooltip.classList.remove('show');
+    }, 2000);
+    
+    // Perform like animation
+    if (isLiked) {
+        button.classList.remove('liked');
+        heartIcon.setAttribute('fill', 'none');
+    } else {
+        button.classList.add('liked');
+        heartIcon.setAttribute('fill', 'currentColor');
+    }
+    
+    // TODO: Add actual like functionality here when backend is ready
+    // This would make an AJAX request to toggle the like status
+}
+
+function toggleContent(button) {
+	const messageDiv = button.previousElementSibling;
+	const fullText = messageDiv.dataset.fullText;
+	const isExpanded = messageDiv.classList.contains('truncated');
+	
+	if (isExpanded) {
+		messageDiv.classList.remove('truncated');
+		button.textContent = 'Afficher moins';
+	} else {
+		messageDiv.classList.add('truncated');
+		button.textContent = 'Afficher plus';
+	}
+}
+
+// ====== OPTIONS MENU FUNCTIONALITY ======
+
+function toggleOptionsMenu(button) {
+	const menu = button.nextElementSibling;
+	const isActive = menu.classList.contains('active');
+	
+	// Close all other open menus
+	document.querySelectorAll('.options-menu.active').forEach(openMenu => {
+		if (openMenu !== menu) {
+			openMenu.classList.remove('active');
+		}
+	});
+	
+	// Toggle current menu
+	menu.classList.toggle('active', !isActive);
+}
+
+// Close options menus when clicking outside
+document.addEventListener('click', (e) => {
+	if (!e.target.closest('.pitch-options')) {
+		document.querySelectorAll('.options-menu.active').forEach(menu => {
+			menu.classList.remove('active');
+		});
+	}
+});
+
+// Close options menus on escape key
+document.addEventListener('keydown', (e) => {
+	if (e.key === 'Escape') {
+		document.querySelectorAll('.options-menu.active').forEach(menu => {
+			menu.classList.remove('active');
+		});
+	}
+});
+
+// ====== DELETE CONFIRMATION FUNCTIONALITY ======
+function confirmDelete(pitchId, csrfToken) {
+    // Set up the form action and CSRF token
+    const form = document.getElementById('deleteForm');
+    form.action = "{{ path('pitch_delete', {'id': 'PLACEHOLDER'}) }}".replace('PLACEHOLDER', pitchId);
+    document.getElementById('csrfToken').value = csrfToken;
+    
+    // Show the modal
+    const modal = document.getElementById('confirmationModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Close options menu
+    document.querySelectorAll('.options-menu.active').forEach(menu => {
+        menu.classList.remove('active');
+    });
+}
+
+function closeConfirmation() {
+    const modal = document.getElementById('confirmationModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close confirmation modal on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('confirmationModal');
+        if (modal.classList.contains('active')) {
+            closeConfirmation();
+        }
+    }
+});
+
+// Close confirmation modal when clicking outside
+document.getElementById('confirmationModal').addEventListener('click', (e) => {
+    if (e.target.id === 'confirmationModal') {
+        closeConfirmation();
+    }
+});
+// ====== PITCH MODIFICATION MODAL ======
+function openModifyModal(pitchId, content, contactInfo, csrfToken) {
+    // Fill the form with current data
+    document.getElementById('modifyPitchId').value = pitchId;
+    document.getElementById('modifyCsrfToken').value = csrfToken;
+    document.getElementById('modifyContent').value = content;
+    document.getElementById('modifyContactInfo').value = contactInfo || '';
+    
+    // Reset errors and success message
+    document.getElementById('modifySuccessMessage').style.display = 'none';
+    document.getElementById('contentError').style.display = 'none';
+    document.getElementById('contactInfoError').style.display = 'none';
+    
+    // Show modal
+    document.getElementById('modifyPitchModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Close options menu
+    document.querySelectorAll('.options-menu.active').forEach(menu => {
+        menu.classList.remove('active');
+    });
+}
+
+function closeModifyModal() {
+    document.getElementById('modifyPitchModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function submitModifyForm() {
+    const pitchId = document.getElementById('modifyPitchId').value;
+    const content = document.getElementById('modifyContent').value.trim();
+    const contactInfo = document.getElementById('modifyContactInfo').value.trim();
+    const csrfToken = document.getElementById('modifyCsrfToken').value;
+
+    let hasError = false;
+
+    // Reset errors
+    const contentField = document.getElementById('modifyContent');
+    const contactField = document.getElementById('modifyContactInfo');
+    const contentError = document.getElementById('contentError');
+    const contactInfoError = document.getElementById('contactInfoError');
+
+    contentError.style.display = 'none';
+    contactInfoError.style.display = 'none';
+    contentField.classList.remove('input-error');
+    contactField.classList.remove('input-error');
+
+    // === Frontend validation ===
+    if (!content) {
+        contentError.textContent = 'Le contenu du pitch est requis.';
+        contentError.style.display = 'flex';
+        contentField.classList.add('input-error');
+        hasError = true;
+    } else if (content.length < 10) {
+        contentError.textContent = 'Le contenu doit faire au moins 10 caractères.';
+        contentError.style.display = 'flex';
+        contentField.classList.add('input-error');
+        hasError = true;
+    }
+
+    if (!contactInfo) {
+        contactInfoError.textContent = 'Les informations de contact sont requises.';
+        contactInfoError.style.display = 'flex';
+        contactField.classList.add('input-error');
+        hasError = true;
+    }
+
+    // If frontend errors → stop here
+    if (hasError) return;
+
+    // === Prepare request ===
+    const url = `/team/pitches/modify/${pitchId}`;
+    const formData = new FormData();
+    formData.append('_token', csrfToken);
+    formData.append('content', content);
+    formData.append('contactInfo', contactInfo);
+
+    // Loading state
+    document.getElementById('submitSpinner').style.display = 'inline-block';
+    document.getElementById('submitText').textContent = 'Modification...';
+
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json()) // always parse JSON, even if 400
+    .then(data => {
+        if (data.success) {
+            // ✅ Success
+            document.getElementById('modifySuccessMessage').style.display = 'flex';
+
+            // Update UI
+            const pitchItem = document.querySelector(`[data-pitch-id="${pitchId}"]`);
+            if (pitchItem) {
+                const pitchContent = pitchItem.querySelector('.pitch-message');
+                const pitchContact = pitchItem.querySelector('.pitch-contact');
+
+                if (pitchContent) {
+                    pitchContent.textContent = data.pitch.content;
+                    pitchContent.dataset.fullText = data.pitch.content;
+                }
+
+                if (pitchContact && data.pitch.contactInfo) {
+                    pitchContact.textContent = data.pitch.contactInfo;
+                }
+            }
+
+            setTimeout(() => closeModifyModal(), 1500);
+        } else if (data.errors) {
+            // ✅ Backend validation errors (400)
+            Object.keys(data.errors).forEach(field => {
+                const errorElement = document.getElementById(field + 'Error');
+                const fieldElement = document.getElementById('modify' + field.charAt(0).toUpperCase() + field.slice(1));
+                if (errorElement) {
+                    errorElement.textContent = data.errors[field];
+                    errorElement.style.display = 'flex';
+                }
+                if (fieldElement) {
+                    fieldElement.classList.add('input-error');
+                }
+            });
+        } else if (data.error) {
+            // ❌ Unexpected backend error (401, 403, 500…)
+            alert(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur s\'est produite lors de la modification du pitch.');
+    })
+    .finally(() => {
+        // Reset loading state
+        document.getElementById('submitSpinner').style.display = 'none';
+        document.getElementById('submitText').textContent = 'Modifier le pitch';
+    });
+}
+
+// Close modify modal on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('modifyPitchModal').classList.contains('active')) {
+        closeModifyModal();
+    }
+});
+
+// Close modify modal when clicking outside
+document.getElementById('modifyPitchModal').addEventListener('click', (e) => {
+    if (e.target.id === 'modifyPitchModal') {
+        closeModifyModal();
+    }
+});
+</script>
+{% endblock %}

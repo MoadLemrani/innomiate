@@ -1,0 +1,115 @@
+# Environment files
+.env
+.env.local
+.env.local.php
+.env.*.local
+!.env.dist
+!.env.test
+
+# User uploads and generated content
+uploads/
+public/uploads/
+var/uploads/
+public/images/uploads/
+public/documents/
+
+# Symfony specific
+/var/cache/
+/var/logs/
+/var/sessions/
+/var/data/
+var/cache/*
+var/logs/*
+var/sessions/*
+!var/cache/.gitkeep
+!var/logs/.gitkeep
+!var/sessions/.gitkeep
+
+# Vendor dependencies
+/vendor/
+node_modules/
+
+# Web assets
+/public/bundles/
+/public/build/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.buildpath
+.settings/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Composer
+composer.phar
+composer.lock.local
+
+# Symfony Encore/Webpack
+/public/build/
+webpack-stats.json
+
+# PHPUnit
+/phpunit.xml
+/.phpunit.result.cache
+/phpunit.result.cache
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+/var/data.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Doctrine migrations (optional - team decision)
+migrations/
+
+# Configuration files with sensitive data
+config/secrets/prod/
+config/jwt/
+jwt/
+
+# User-generated content
+public/media/
+public/assets/uploads/
+var/uploads/
+uploads/
+
+# Backup files
+*.bak
+*.backup
+
+# Cache and compiled files
+.web-server-pid
+/bin/.phpunit
+/bin/.phpunit.result.cache
+
+# Symfony binary
+symfony
+symfony.exe
+.symfony.local.yaml
+
+# Asset compilation
+yarn.lock.local
+package-lock.json.local

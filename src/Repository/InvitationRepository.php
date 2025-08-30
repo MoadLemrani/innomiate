@@ -19,10 +19,14 @@ class InvitationRepository extends ServiceEntityRepository
         parent::__construct($registry, Invitation::class);
     }
 
-    public function findPendingForParticipant(Participant $participant): array
+    public function findPendingForParticipant(?Participant $participant): array
     {
+        if (!$participant) {//early return
+            return [];
+        }
+
         return $this->createQueryBuilder('i')
-            ->andWhere('i.receiver_participant = :participant')
+            ->andWhere('i.receiverParticipant = :participant')
             ->andWhere('i.status = :status')
             ->setParameter('participant', $participant)
             ->setParameter('status', InvitationStatus::PENDING)
@@ -33,8 +37,8 @@ class InvitationRepository extends ServiceEntityRepository
     public function findOneByParticipantsAndTeam(Participant $sender, Participant $receiver, Team $team): ?Invitation
     {
         return $this->createQueryBuilder('i')
-            ->andWhere('i.sender_participant = :sender')
-            ->andWhere('i.receiver_participant = :receiver')
+            ->andWhere('i.senderParticipant = :sender')
+            ->andWhere('i.receiverParticipant = :receiver')
             ->andWhere('i.team = :team')
             ->setParameter('sender', $sender)
             ->setParameter('receiver', $receiver)
@@ -51,7 +55,7 @@ class InvitationRepository extends ServiceEntityRepository
 
         return (int) $this->createQueryBuilder('i')
             ->select('COUNT(i.id)')
-            ->andWhere('i.receiver_participant = :participant')
+            ->andWhere('i.receiverParticipant = :participant')
             ->setParameter('participant', $participant)
             ->getQuery()
             ->getSingleScalarResult();

@@ -25,4 +25,27 @@ class PitchRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * Update a Pitch
+     */
+    /*public function update(Pitch $pitch, bool $flush = true): void
+    {
+        // Entity is already tracked if fetched via Doctrine, so persist is optional.
+        $this->_em->persist($pitch);
+        if ($flush) {
+            $this->_em->flush();
+        }
+    }*/
+
+    /**
+     * Remove a Pitch
+     */
+    /*public function remove(Pitch $pitch, bool $flush = true): void
+    {
+        $this->_em->remove($pitch);
+        if ($flush) {
+            $this->_em->flush();
+        }
+    }*/
 }

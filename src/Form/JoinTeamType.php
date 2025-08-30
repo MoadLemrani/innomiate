@@ -13,17 +13,13 @@ class JoinTeamType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('teamId', TextType::class, [
-                'label' => 'Identifiant d\'équipe',
+            ->add('teamCode', TextType::class, [
+                'label' => false,
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'L\'identifiant d\'équipe est obligatoire',
+                        'message' => 'Le code d\'équipe est obligatoire',
                     ]),
                 ],
-                'attr' => [
-                    'placeholder' => 'Entrez l\'identifiant fourni par votre leader',
-                ],
-                'help' => 'Demandez cet identifiant au leader de l\'équipe que vous souhaitez rejoindre',
             ]);
     }
 

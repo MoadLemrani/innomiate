@@ -19,7 +19,7 @@ class TeamType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Nom de l\'équipe',
+                'label' => false,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Le nom de l\'équipe est obligatoire',
@@ -31,29 +31,11 @@ class TeamType extends AbstractType
                         'maxMessage' => 'Le nom de l\'équipe ne peut pas dépasser {{ limit }} caractères',
                     ]),
                 ],
-                'attr' => [
-                    'placeholder' => 'Donnez un nom à votre équipe',
-                ],
-            ])
-            ->add('competition', EntityType::class, [
-                'class' => Competition::class,
-                'choice_label' => 'name',
-                'label' => 'Compétition',
-                'placeholder' => 'Sélectionnez une compétition',
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez sélectionner une compétition',
-                    ]),
-                ],
             ])
             ->add('memberCodes', TextareaType::class, [
-                'label' => 'Codes des membres',
+                'label' => false,
+                'mapped' => false,
                 'required' => false,
-                'attr' => [
-                    'placeholder' => 'Entrez les codes participant de vos coéquipiers, séparés par des virgules',
-                    'rows' => 4,
-                ],
-                'help' => 'Vous pouvez ajouter des membres. Chacun recevra une invitation.',
             ]);
     }
 

@@ -28,7 +28,7 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
         // Check what role they have and send them to the right page
         if (in_array('ROLE_SUPERADMIN', $roles)) {
             // If they are SUPERADMIN, send them to admin page
-            $route = 'app_super_admin_dashboard';
+            $route = 'app_admin';
         } elseif (in_array('ROLE_PARTICIPANT', $roles)) {
             // If they are PARTICIPANT, send them to participant page
             $route = 'app_dashboard';

@@ -1,0 +1,1165 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Phases d'Inscription - INNOMIATE
+{% endblock %}
+
+{% block body %}
+	<style>
+		/* =================================
+		   CSS VARIABLES & ROOT SETTINGS
+		   ================================= */
+		:root {
+			--primary-red: #ff3e5f;
+			--primary-green: #2ecc71;
+			--primary-blue: #667eea;
+			--primary-purple: #764ba2;
+			--primary-white: #ffffff;
+			--dark-bg: #0f1621;
+			--glass-bg: rgba(255, 255, 255, 0.05);
+			--text-light: #f0f0f0;
+			--text-dim: #b0b0b0;
+			--shadow-neon-red: 0 0 10px rgba(255, 62, 95, 0.3);
+			--shadow-neon-green: 0 0 10px rgba(46, 204, 113, 0.3);
+			--shadow-neon-blue: 0 0 10px rgba(102, 126, 234, 0.3);
+			--shadow-color: rgba(0, 0, 0, 0.3);
+			--card-background: rgba(255, 255, 255, 0.1);
+			--transition: all 0.3s ease;
+			--countdown-bg: rgba(255, 62, 95, 0.1);
+		}
+
+		:root[data-theme="light"] {
+			--primary-red: #e74c3c;
+			--primary-green: #27ae60;
+			--primary-blue: #2980b9;
+			--primary-purple: #8e44ad;
+			--primary-white: #2c3e50;
+			--dark-bg: #f8f9fa;
+			--glass-bg: rgba(255, 255, 255, 0.95);
+			--text-light: #2c3e50;
+			--text-dim: #7f8c8d;
+			--shadow-neon-red: 0 0 10px rgba(231, 76, 60, 0.2);
+			--shadow-neon-green: 0 0 10px rgba(39, 174, 96, 0.2);
+			--shadow-neon-blue: 0 0 10px rgba(41, 128, 185, 0.2);
+			--shadow-color: rgba(0, 0, 0, 0.1);
+			--card-background: rgba(255, 255, 255, 0.95);
+			--countdown-bg: rgba(231, 76, 60, 0.1);
+		}
+
+		/* =================================
+		   GLOBAL STYLES
+		   ================================= */
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			background: var(--dark-bg);
+			color: var(--text-light);
+			min-height: 100vh;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			transition: var(--transition);
+			position: relative;
+			overflow-x: hidden;
+		}
+
+		/* =================================
+		   DECORATIVE BACKGROUND
+		   ================================= */
+		.decorative-bg {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			z-index: 0;
+			opacity: 0.1;
+		}
+
+		.decorative-bg svg {
+			width: 100%;
+			height: 100%;
+		}
+
+		/* =================================
+		   ANIMATIONS & KEYFRAMES
+		   ================================= */
+		@keyframes fadeIn {
+			from { opacity: 0; transform: translateY(-5px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		@keyframes slideInDown {
+			from { transform: translateY(-100px); opacity: 0; }
+			to { transform: translateY(0); opacity: 1; }
+		}
+
+		@keyframes fadeInUp {
+			from { transform: translateY(50px); opacity: 0; }
+			to { transform: translateY(0); opacity: 1; }
+		}
+
+		@keyframes pulse {
+			0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 62, 95, 0.4); }
+			50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 62, 95, 0); }
+		}
+
+		@keyframes float {
+			0%, 100% { transform: translateY(0px); }
+			50% { transform: translateY(-10px); }
+		}
+
+		@keyframes shimmer {
+			0% { transform: translateX(-100%) translateY(-100%) rotate(-45deg); }
+			100% { transform: translateX(100%) translateY(100%) rotate(-45deg); }
+		}
+
+		@keyframes countdownPulse {
+			0%, 100% { transform: scale(1); }
+			50% { transform: scale(1.02); }
+		}
+
+		/* =================================
+		   THEME TOGGLE COMPONENT
+		   ================================= */
+		.theme-toggle {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			z-index: 999;
+			background: var(--card-background);
+			border: 2px solid var(--text-light);
+			border-radius: 50px;
+			padding: 8px;
+			cursor: pointer;
+			box-shadow: 0 4px 15px var(--shadow-color);
+			transition: var(--transition);
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			width: 40px;
+			height: 40px;
+		}
+
+		.theme-toggle:hover {
+			transform: scale(1.05);
+			box-shadow: 0 6px 20px var(--shadow-color);
+		}
+
+		.theme-toggle .sun-icon,
+		.theme-toggle .moon-icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.theme-toggle svg {
+			width: 20px;
+			height: 20px;
+			display: block;
+			color: currentColor;
+			transition: var(--transition);
+		}
+
+		.theme-toggle .sun-icon svg { color: #ffa500; }
+		.theme-toggle .moon-icon svg { color: #4cc9f0; }
+
+		/* =================================
+		   HELP BUTTON
+		   ================================= */
+		.help-button {
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			z-index: 998;
+			width: 50px;
+			height: 50px;
+			background: var(--primary-red);
+			border: none;
+			border-radius: 50%;
+			color: white;
+			font-size: 20px;
+			font-weight: 700;
+			cursor: pointer;
+			box-shadow: 0 4px 15px var(--shadow-neon-red);
+			transition: var(--transition);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.help-button:hover {
+			transform: scale(1.05);
+			box-shadow: 0 6px 25px var(--shadow-neon-red);
+		}
+
+		/* =================================
+		   MODAL STYLES
+		   ================================= */
+		.modal-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.7);
+			z-index: 1000;
+			display: none;
+			align-items: center;
+			justify-content: center;
+			backdrop-filter: blur(5px);
+		}
+
+		.modal-overlay.active {
+			display: flex;
+			animation: fadeIn 0.3s ease-in-out;
+		}
+
+		.modal-content {
+			background: var(--card-background);
+			backdrop-filter: blur(20px);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 20px;
+			padding: 30px;
+			max-width: 500px;
+			width: 90%;
+			position: relative;
+			box-shadow: 0 20px 60px var(--shadow-color);
+		}
+
+		.modal-close {
+			position: absolute;
+			top: 15px;
+			right: 20px;
+			background: none;
+			border: none;
+			font-size: 24px;
+			color: var(--text-light);
+			cursor: pointer;
+			padding: 5px;
+		}
+
+		.modal-title {
+			font-size: 24px;
+			font-weight: 700;
+			margin-bottom: 20px;
+			color: var(--primary-red);
+		}
+
+		.modal-section {
+			margin-bottom: 20px;
+		}
+
+		.modal-section h4 {
+			font-size: 18px;
+			font-weight: 600;
+			color: var(--text-light);
+			margin-bottom: 10px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.modal-section p {
+			color: var(--text-dim);
+			line-height: 1.6;
+		}
+
+		/* =================================
+		   HEADER SECTION
+		   ================================= */
+		.page-container {
+			min-height: 100vh;
+			padding: 80px 20px 40px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			position: relative;
+			z-index: 1;
+		}
+
+		.page-header {
+			text-align: center;
+			margin-bottom: 40px;
+			animation: slideInDown 0.8s ease-out;
+		}
+
+		.logo-link {
+			display: inline-block;
+			text-decoration: none;
+			color: inherit;
+			margin-bottom: 30px;
+			transition: transform 0.3s ease;
+		}
+
+		.logo-link:hover {
+			transform: scale(1.05);
+		}
+
+		.logo-container {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 15px;
+		}
+
+		.logo-img {
+			width: 60px;
+			height: 60px;
+		}
+
+		.logo-title {
+			font-size: 28px;
+			font-weight: 700;
+			background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
+			-webkit-background-clip: text;
+			background-clip: text;
+			color: transparent;
+		}
+
+		.page-title {
+			font-size: 42px;
+			font-weight: 700;
+			margin-bottom: 15px;
+			color: var(--text-light);
+			background: linear-gradient(135deg, var(--primary-red) 0%, #ff6b85 100%);
+			-webkit-background-clip: text;
+			background-clip: text;
+			color: transparent;
+		}
+
+		.hackathon-title {
+			font-size: 32px;
+			font-weight: 700;
+			background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-purple) 100%);
+			-webkit-background-clip: text;
+			background-clip: text;
+			color: transparent;
+			margin-bottom: 20px;
+		}
+
+		.page-subtitle {
+			font-size: 18px;
+			color: var(--text-dim);
+			max-width: 600px;
+			margin: 0 auto 30px;
+			line-height: 1.6;
+		}
+
+		/* =================================
+		   COUNTDOWN TIMER
+		   ================================= */
+		.countdown-container {
+			background: var(--countdown-bg);
+			border: 2px solid var(--primary-red);
+			border-radius: 15px;
+			padding: 20px;
+			margin-bottom: 30px;
+			animation: countdownPulse 2s infinite;
+			backdrop-filter: blur(10px);
+		}
+
+		.countdown-title {
+			font-size: 16px;
+			font-weight: 600;
+			color: var(--primary-red);
+			margin-bottom: 10px;
+			text-align: center;
+		}
+
+		.countdown-timer {
+			display: flex;
+			justify-content: center;
+			gap: 15px;
+		}
+
+		.countdown-item {
+			text-align: center;
+			min-width: 60px;
+		}
+
+		.countdown-number {
+			font-size: 24px;
+			font-weight: 700;
+			color: var(--text-light);
+			display: block;
+		}
+
+		.countdown-label {
+			font-size: 12px;
+			color: var(--text-dim);
+			text-transform: uppercase;
+		}
+
+		/* =================================
+		   GLASS CARD BASE
+		   ================================= */
+		.glass-card {
+			background: var(--card-background);
+			backdrop-filter: blur(10px);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 20px;
+			box-shadow: 0 8px 32px var(--shadow-color);
+			transition: var(--transition);
+		}
+
+		:root[data-theme="light"] .glass-card {
+			border: 1px solid rgba(0, 0, 0, 0.1);
+		}
+
+		/* =================================
+		   PHASES CONTAINER
+		   ================================= */
+		.phases-container {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 40px;
+			max-width: 800px;
+			width: 100%;
+			animation: fadeInUp 1s ease-out 0.3s both;
+		}
+
+		.phase-card {
+			padding: 40px 30px;
+			text-align: center;
+			position: relative;
+			overflow: hidden;
+			transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+			cursor: pointer;
+		}
+
+		.phase-card:hover {
+			transform: translateY(-10px) scale(1.02);
+			box-shadow: 0 20px 60px var(--shadow-color);
+		}
+
+		.phase-card:nth-child(1) {
+			border: 2px solid var(--primary-red);
+		}
+
+		.phase-card:nth-child(1):hover {
+			box-shadow: var(--shadow-neon-red), 0 20px 60px var(--shadow-color);
+		}
+
+		.phase-card:nth-child(2) {
+			border: 2px solid var(--primary-green);
+		}
+
+		.phase-card:nth-child(2):hover {
+			box-shadow: var(--shadow-neon-green), 0 20px 60px var(--shadow-color);
+		}
+
+		/* Phase Icon Circle */
+		.phase-icon {
+			width: 120px;
+			height: 120px;
+			border-radius: 50%;
+			margin: 0 auto 25px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 48px;
+			color: white;
+			position: relative;
+			transition: all 0.4s ease;
+			animation: float 3s ease-in-out infinite;
+		}
+
+		.phase-card:nth-child(1) .phase-icon {
+			background: linear-gradient(135deg, var(--primary-red) 0%, #ff6b85 100%);
+			animation-delay: 0s;
+		}
+
+		.phase-card:nth-child(2) .phase-icon {
+			background: linear-gradient(135deg, var(--primary-green) 0%, #52ee86 100%);
+			animation-delay: 1.5s;
+		}
+
+		.phase-card:hover .phase-icon {
+			transform: scale(1.1) rotate(10deg);
+			animation-play-state: paused;
+		}
+
+		.phase-icon svg {
+			width: 48px;
+			height: 48px;
+		}
+
+		.phase-number {
+			position: absolute;
+			top: -10px;
+			right: -10px;
+			width: 40px;
+			height: 40px;
+			background: var(--primary-red);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 700;
+			font-size: 18px;
+			color: white;
+			box-shadow: 0 4px 15px rgba(255, 62, 95, 0.4);
+		}
+
+		/* Phase Content */
+		.phase-title {
+			font-size: 24px;
+			font-weight: 700;
+			margin-bottom: 15px;
+			color: var(--text-light);
+		}
+
+		.phase-card:nth-child(1) .phase-title {
+			background: linear-gradient(135deg, var(--primary-red) 0%, #ff6b85 100%);
+			-webkit-background-clip: text;
+			background-clip: text;
+			color: transparent;
+		}
+
+		.phase-card:nth-child(2) .phase-title {
+			background: linear-gradient(135deg, var(--primary-green) 0%, #52ee86 100%);
+			-webkit-background-clip: text;
+			background-clip: text;
+			color: transparent;
+		}
+
+		.phase-description {
+			font-size: 16px;
+			color: var(--text-dim);
+			line-height: 1.6;
+			margin-bottom: 25px;
+		}
+
+		/* Phase Action Button */
+		.phase-action {
+			display: inline-block;
+			padding: 12px 30px;
+			border-radius: 25px;
+			text-decoration: none;
+			font-weight: 600;
+			font-size: 16px;
+			transition: all 0.3s ease;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.phase-card:nth-child(1) .phase-action {
+			background: linear-gradient(135deg, var(--primary-red) 0%, #ff6b85 100%);
+			color: white;
+		}
+
+		.phase-card:nth-child(1) .phase-action:hover {
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-neon-red);
+		}
+
+		.phase-card:nth-child(2) .phase-action {
+			background: linear-gradient(135deg, var(--primary-green) 0%, #52ee86 100%);
+			color: white;
+		}
+
+		.phase-card:nth-child(2) .phase-action:hover {
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-neon-green);
+		}
+
+		/* Decorative elements */
+		.phase-card::before {
+			content: '';
+			position: absolute;
+			top: -50%;
+			left: -50%;
+			width: 200%;
+			height: 200%;
+			background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+			transform: rotate(-45deg);
+			transition: all 0.6s ease;
+			opacity: 0;
+		}
+
+		.phase-card:hover::before {
+			opacity: 1;
+			animation: shimmer 1.5s ease-in-out;
+		}
+
+		/* =================================
+		   FLASH MESSAGES
+		   ================================= */
+		.flash-messages {
+			position: fixed;
+			top: 80px;
+			left: 50%;
+			transform: translateX(-50%);
+			z-index: 1000;
+			width: 90%;
+			max-width: 600px;
+			pointer-events: none;
+		}
+
+		.flash-messages > div {
+			pointer-events: all;
+		}
+
+		.flash-info,
+		.flash-success,
+		.flash-error,
+		.flash-warning {
+			padding: 12px 16px;
+			margin-bottom: 15px;
+			border-radius: 8px;
+			font-size: 14px;
+			animation: fadeIn 0.3s ease-in-out;
+			text-align: center;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+			border: 1px solid;
+			backdrop-filter: blur(10px);
+			position: relative;
+		}
+
+		.flash-info {
+			background: rgba(52, 152, 219, 0.1);
+			border-color: var(--primary-blue);
+			color: var(--primary-blue);
+			box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+		}
+
+		.flash-success {
+			background: rgba(46, 204, 113, 0.1);
+			border-color: var(--primary-green);
+			color: var(--primary-green);
+			box-shadow: var(--shadow-neon-green);
+		}
+
+		.flash-error {
+			background: rgba(255, 62, 95, 0.1);
+			border-color: var(--primary-red);
+			color: var(--primary-red);
+			box-shadow: var(--shadow-neon-red);
+		}
+
+		.flash-warning {
+			background: rgba(255, 193, 7, 0.1);
+			border-color: #ffc107;
+			color: #ffc107;
+			box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+		}
+
+		.flash-close {
+			background: none;
+			border: none;
+			color: currentColor;
+			opacity: 0.7;
+			cursor: pointer;
+			font-size: 20px;
+			font-weight: 600;
+			position: absolute;
+			top: 50%;
+			right: 12px;
+			transform: translateY(-50%);
+			width: 24px;
+			height: 24px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 50%;
+			transition: all 0.2s ease;
+		}
+
+		.flash-close:hover {
+			opacity: 1;
+			background: rgba(255, 255, 255, 0.1);
+			transform: translateY(-50%) scale(1.1);
+		}
+
+		/* =================================
+		   RESPONSIVE DESIGN
+		   ================================= */
+		@media (max-width: 768px) {
+			.page-container {
+				padding: 100px 15px 40px;
+			}
+
+			.page-title {
+				font-size: 32px;
+			}
+
+			.hackathon-title {
+				font-size: 24px;
+			}
+
+			.page-subtitle {
+				font-size: 16px;
+			}
+
+			.logo-title {
+				font-size: 24px;
+			}
+
+			.logo-img {
+				width: 50px;
+				height: 50px;
+			}
+
+			.phases-container {
+				grid-template-columns: 1fr;
+				gap: 30px;
+				max-width: 400px;
+			}
+
+			.phase-card {
+				padding: 30px 20px;
+			}
+
+			.phase-icon {
+				width: 100px;
+				height: 100px;
+				font-size: 40px;
+			}
+
+			.phase-icon svg {
+				width: 40px;
+				height: 40px;
+			}
+
+			.phase-title {
+				font-size: 20px;
+			}
+
+			.phase-description {
+				font-size: 15px;
+			}
+
+			.countdown-timer {
+				gap: 10px;
+			}
+
+			.countdown-item {
+				min-width: 50px;
+			}
+
+			.countdown-number {
+				font-size: 20px;
+			}
+
+			.help-button {
+				width: 45px;
+				height: 45px;
+				font-size: 18px;
+			}
+		}
+
+		@media (max-width: 480px) {
+			.page-container {
+				padding: 80px 10px 30px;
+			}
+
+			.page-header {
+				margin-bottom: 30px;
+			}
+
+			.page-title {
+				font-size: 28px;
+			}
+
+			.hackathon-title {
+				font-size: 20px;
+			}
+
+			.countdown-container {
+				padding: 15px;
+			}
+
+			.countdown-timer {
+				gap: 8px;
+			}
+
+			.countdown-item {
+				min-width: 40px;
+			}
+
+			.countdown-number {
+				font-size: 18px;
+			}
+
+			.countdown-label {
+				font-size: 10px;
+			}
+		}
+
+		/* =================================
+		   ACCESSIBILITY IMPROVEMENTS
+		   ================================= */
+		.phase-card:focus {
+			outline: 3px solid var(--primary-red);
+			outline-offset: 2px;
+		}
+
+		.phase-action:focus {
+			outline: 2px solid var(--text-light);
+			outline-offset: 2px;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			* {
+				animation-duration: 0.01ms !important;
+				animation-iteration-count: 1 !important;
+				transition-duration: 0.01ms !important;
+			}
+
+			.phase-icon {
+				animation: none;
+			}
+
+			.countdown-container {
+				animation: none;
+			}
+		}
+	</style>
+
+	<!-- Decorative Background -->
+	<div class="decorative-bg">
+		<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+			<defs>
+				<radialGradient id="grad1" cx="20%" cy="30%" r="30%">
+					<stop offset="0%" style="stop-color:var(--primary-red);stop-opacity:0.3" />
+					<stop offset="100%" style="stop-color:var(--primary-red);stop-opacity:0" />
+				</radialGradient>
+				<radialGradient id="grad2" cx="80%" cy="70%" r="25%">
+					<stop offset="0%" style="stop-color:var(--primary-green);stop-opacity:0.2" />
+					<stop offset="100%" style="stop-color:var(--primary-green);stop-opacity:0" />
+				</radialGradient>
+				<radialGradient id="grad3" cx="50%" cy="10%" r="20%">
+					<stop offset="0%" style="stop-color:var(--primary-blue);stop-opacity:0.2" />
+					<stop offset="100%" style="stop-color:var(--primary-blue);stop-opacity:0" />
+				</radialGradient>
+			</defs>
+			<circle cx="240" cy="240" r="200" fill="url(#grad1)" />
+			<circle cx="960" cy="560" r="150" fill="url(#grad2)" />
+			<circle cx="600" cy="80" r="120" fill="url(#grad3)" />
+		</svg>
+	</div>
+
+	<!-- Theme Toggle Button -->
+	<button id="darkModeToggle" class="theme-toggle" aria-label="Changer de thème">
+		<span class="sun-icon">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+				<path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z"/>
+			</svg>
+		</span>
+		<span class="moon-icon">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+				<path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69a.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z" clip-rule="evenodd"/>
+			</svg>
+		</span>
+	</button>
+
+	<!-- Help Button -->
+	<button id="helpButton" class="help-button" aria-label="Aide">
+		?
+	</button>
+
+	<!-- Help Modal -->
+	<div id="helpModal" class="modal-overlay">
+		<div class="modal-content">
+			<button class="modal-close" onclick="closeHelpModal()">&times;</button>
+			<h3 class="modal-title">💡 Guide d'inscription</h3>
+			
+			<div class="modal-section">
+				<h4>
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-red)">
+						<path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+					</svg>
+					Inscription Individuelle
+				</h4>
+				<p>Créez votre profil personnel pour rejoindre le hackathon. Vous pourrez ensuite être invité dans une équipe ou en créer une nouvelle.</p>
+			</div>
+
+			<div class="modal-section">
+				<h4>
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-green)">
+						<path fill-rule="evenodd" d="M8.25 6.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM15.75 9.75a3 3 0 116 0 3 3 0 01-6 0zM2.25 9.75a3 3 0 116 0 3 3 0 01-6 0zM6.31 15.117A6.745 6.745 0 0112 12a6.745 6.745 0 016.709 7.498.75.75 0 01-.372.568A12.696 12.696 0 0112 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 01-.372-.568 6.787 6.787 0 011.019-1.381z" clip-rule="evenodd" />
+						<path d="M5.082 14.254a8.287 8.287 0 00-1.308 5.135 9.687 9.687 0 01-1.764-.44l-.115-.04a.563.563 0 01-.373-.487l-.01-.121a3.75 3.75 0 013.57-4.047zM20.226 19.389a8.287 8.287 0 00-1.308-5.135 3.75 3.75 0 013.57 4.047l-.01.121a.563.563 0 01-.373.486l-.115.041c-.604.21-1.213.384-1.764.44z" />
+					</svg>
+					Inscription Équipe
+				</h4>
+				<p>Créez votre équipe si vous avez déjà des coéquipiers, ou rejoignez une équipe existante.</p>
+			</div>
+
+			<div class="modal-section">
+				<h4>🎯 Conseil</h4>
+				<p>Vous pouvez commencer par vous inscrire individuellement, puis créer ou rejoindre une équipe plus tard. Les deux options sont complémentaires !</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="page-container">
+		{# Flash Messages #}
+		<div class="flash-messages">
+			{% for message in app.flashes('info') %}
+				<div class="flash-info">
+					<span class="icon">ℹ️</span>
+					{{ message }}
+					<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+				</div>
+			{% endfor %}
+
+			{% for message in app.flashes('success') %}
+				<div class="flash-success">
+					<span class="icon">✅</span>
+					{{ message }}
+					<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+				</div>
+			{% endfor %}
+
+			{% for message in app.flashes('error') %}
+				<div class="flash-error">
+					<span class="icon">❌</span>
+					{{ message }}
+					<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+				</div>
+			{% endfor %}
+
+			{% for message in app.flashes('warning') %}
+				<div class="flash-warning">
+					<span class="icon">⚠️</span>
+					{{ message }}
+					<button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+				</div>
+			{% endfor %}
+		</div>
+
+		<!-- Header Section -->
+		<div class="page-header">
+			<a href="{{ path('app_dashboard') }}" class="logo-link" onclick="window.location=this.href; return false;">
+				<div class="logo-container">
+					<img src="/images/MIA_Logo.png" alt="Logo INNOMIATE" class="logo-img"/>
+					<h1 class="logo-title">INNOMIATE</h1>
+				</div>
+			</a>
+			
+			<h2 class="page-title">Rejoignez l'aventure</h2>
+			<h3 class="hackathon-title">{{competition.name|upper}}</h3>
+			<p class="page-subtitle">
+				Inscrivez-vous dès aujourd'hui et trouvez votre équipe pour relever le défi.
+			</p>
+
+			<!-- Countdown Timer -->
+			{% if competition.endDate %}
+				<div class="countdown-container">
+					<div class="countdown-title">⏰ Inscriptions ouvertes encore</div>
+					<div class="countdown-timer" id="countdown">
+						<div class="countdown-item">
+							<span class="countdown-number" id="days">--</span>
+							<span class="countdown-label">Jours</span>
+						</div>
+						<div class="countdown-item">
+							<span class="countdown-number" id="hours">--</span>
+							<span class="countdown-label">Heures</span>
+						</div>
+						<div class="countdown-item">
+							<span class="countdown-number" id="minutes">--</span>
+							<span class="countdown-label">Min</span>
+						</div>
+						<div class="countdown-item">
+							<span class="countdown-number" id="seconds">--</span>
+							<span class="countdown-label">Sec</span>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+
+		<!-- Phases Container -->
+		<div class="phases-container">
+			<!-- Phase 1: Individual Registration -->
+			<div class="glass-card phase-card" tabindex="0" role="button" onclick="window.location.href='{{ path('app_participant') }}'">
+				<div class="phase-icon">
+					<div class="phase-number">1</div>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+						<path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+					</svg>
+				</div>
+				<h3 class="phase-title">Inscription Individuelle</h3>
+				<p class="phase-description">
+					Créez votre profil pour rejoindre plus tard une équipe. Présentez vos compétences et trouvez les coéquipiers parfaits.
+				</p>
+				<a href="{{ path('app_participant') }}" class="phase-action" onclick="window.location=this.href; return false;">
+					Créer mon profil
+				</a>
+			</div>
+
+			<!-- Phase 2: Team Management -->
+			<div class="glass-card phase-card" tabindex="0" role="button" onclick="window.location.href='{{ path('team_index') }}'">
+				<div class="phase-icon">
+					<div class="phase-number">2</div>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+						<path fill-rule="evenodd" d="M8.25 6.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM15.75 9.75a3 3 0 116 0 3 3 0 01-6 0zM2.25 9.75a3 3 0 116 0 3 3 0 01-6 0zM6.31 15.117A6.745 6.745 0 0112 12a6.745 6.745 0 016.709 7.498.75.75 0 01-.372.568A12.696 12.696 0 0112 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 01-.372-.568 6.787 6.787 0 011.019-1.381z" clip-rule="evenodd" />
+						<path d="M5.082 14.254a8.287 8.287 0 00-1.308 5.135 9.687 9.687 0 01-1.764-.44l-.115-.04a.563.563 0 01-.373-.487l-.01-.121a3.75 3.75 0 013.57-4.047zM20.226 19.389a8.287 8.287 0 00-1.308-5.135 3.75 3.75 0 013.57 4.047l-.01.121a.563.563 0 01-.373.486l-.115.041c-.604.21-1.213.384-1.764.44z" />
+					</svg>
+				</div>
+				<h3 class="phase-title">Inscription Équipe</h3>
+				<p class="phase-description">
+					Créez ou gérez une équipe avec vos coéquipiers. Collaborez et innovez ensemble pour remporter le défi.
+				</p>
+				<a href="{{ path('team_index') }}" class="phase-action" onclick="window.location=this.href; return false;">
+					Gérer mon équipe
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Dark Mode Toggle Functionality
+		const themeToggle = document.getElementById('darkModeToggle');
+		const sunIcon = themeToggle.querySelector('.sun-icon');
+		const moonIcon = themeToggle.querySelector('.moon-icon');
+
+		// Enhanced theme initialization
+		function initializeTheme() {
+			const savedTheme = localStorage.getItem('theme');
+			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			const defaultTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+			document.documentElement.setAttribute('data-theme', defaultTheme);
+			updateToggleIcons(defaultTheme === 'dark');
+
+			if (!savedTheme) {
+				localStorage.setItem('theme', defaultTheme);
+			}
+		}
+
+		function updateToggleIcons(isDark) {
+			sunIcon.style.display = isDark ? 'flex' : 'none';
+			moonIcon.style.display = isDark ? 'none' : 'flex';
+		}
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateToggleIcons(newTheme === 'dark');
+		}
+
+		// Initialize theme immediately
+		initializeTheme();
+
+		themeToggle.addEventListener('click', toggleTheme);
+		themeToggle.addEventListener('keydown', function(e) {
+			if (e.key === ' ' || e.key === 'Enter') {
+				e.preventDefault();
+				toggleTheme();
+			}
+		});
+
+		// Help Modal Functions
+		const helpButton = document.getElementById('helpButton');
+		const helpModal = document.getElementById('helpModal');
+
+		function openHelpModal() {
+			helpModal.classList.add('active');
+			document.body.style.overflow = 'hidden';
+		}
+
+		function closeHelpModal() {
+			helpModal.classList.remove('active');
+			document.body.style.overflow = '';
+		}
+
+		helpButton.addEventListener('click', openHelpModal);
+
+		helpModal.addEventListener('click', function(e) {
+			if (e.target === helpModal) {
+				closeHelpModal();
+			}
+		});
+
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape' && helpModal.classList.contains('active')) {
+				closeHelpModal();
+			}
+		});
+
+		// Countdown Timer
+		{% if competition.endDate %}
+		function updateCountdown() {
+			const endDate = new Date('{{ competition.endDate|date("Y-m-d H:i:s") }}').getTime();
+			const now = new Date().getTime();
+			const timeLeft = endDate - now;
+
+			if (timeLeft > 0) {
+				const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+				const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+				const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+				const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+				document.getElementById('days').textContent = days.toString().padStart(2, '0');
+				document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+				document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+				document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+			} else {
+				document.querySelector('.countdown-title').textContent = '⏰ Inscriptions terminées';
+				document.getElementById('days').textContent = '00';
+				document.getElementById('hours').textContent = '00';
+				document.getElementById('minutes').textContent = '00';
+				document.getElementById('seconds').textContent = '00';
+			}
+		}
+
+		// Update countdown every second
+		updateCountdown();
+		setInterval(updateCountdown, 1000);
+		{% endif %}
+
+		// Keyboard navigation for phase cards
+		document.addEventListener('keydown', function(e) {
+			const focusedCard = document.activeElement;
+			if (focusedCard.classList.contains('phase-card') && (e.key === 'Enter' || e.key === ' ')) {
+				e.preventDefault();
+				focusedCard.click();
+			}
+		});
+
+		// Enhanced hover effects and flash message functionality
+		document.addEventListener('DOMContentLoaded', function() {
+			const phaseCards = document.querySelectorAll('.phase-card');
+			
+			phaseCards.forEach(card => {
+				card.addEventListener('mouseenter', function() {
+					const icon = this.querySelector('.phase-icon');
+					if (icon) {
+						icon.style.animationPlayState = 'paused';
+					}
+				});
+				
+				card.addEventListener('mouseleave', function() {
+					const icon = this.querySelector('.phase-icon');
+					if (icon) {
+						icon.style.animationPlayState = 'running';
+					}
+				});
+			});
+
+			// Auto-dismiss flash messages after 5 seconds
+			const flashMessages = document.querySelectorAll('.flash-info, .flash-success, .flash-error, .flash-warning');
+			flashMessages.forEach(message => {
+				setTimeout(() => {
+					if (message.parentNode) {
+						message.style.transition = 'opacity 0.5s ease';
+						message.style.opacity = '0';
+						setTimeout(() => message.remove(), 500);
+					}
+				}, 5000);
+			});
+		});
+	</script>
+{% endblock %}

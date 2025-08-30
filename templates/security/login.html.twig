@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}Connexion
 {% endblock %}
 
@@ -747,7 +748,7 @@
 					</div>
 
 					<div class="recaptcha-wrapper">
-						<div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}" data-callback="enablesubmitbutton"></div>
+						<div class="g-recaptcha" data-sitekey="6LeEdJwrAAAAAHxraltIg7iWJqvFyQ6NykZcli_Z" data-callback="enablesubmitbutton"></div>
 					</div>
 
 					<button type="submit" class="btn btn-green" id="submit-btn" disabled="disabled" style="width: 100%;">
@@ -758,7 +759,7 @@
 
 				<div class="auth-footer">
 					Vous n'avez pas de compte ?
-					<a href="{{ path('app_register') }}" class="auth-link">Inscrivez-vous</a>
+					<a href="{{ path('app_register') }}" class="auth-link" onclick="window.location=this.href; return false;">Inscrivez-vous</a>
 				</div>
 			</div>
 		</div>
@@ -933,8 +934,7 @@ document.addEventListener('DOMContentLoaded', function() {
     new ThemeManager();
     new FormEnhancer();
 });
-</script>
-
+    </script>
 	<!-- reCAPTCHA API Script -->
 	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    {% endblock %}
+{% endblock %}

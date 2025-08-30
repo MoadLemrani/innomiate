@@ -44,7 +44,7 @@ class DashboardController extends AbstractController
 
         $participants = $user->getParticipants(); // returns Collection
         $count = 0;
-        foreach ($participants as $participant) {
+        foreach ($participants as $participant) {//this invitation count is for the future when there is a lot of competition to regiser in
             $count += $this->invitationRepository->count([
                 'receiverParticipant' => $participant,
                 'status' => InvitationStatus::PENDING,
@@ -54,40 +54,6 @@ class DashboardController extends AbstractController
         return $this->render('participant/dashboard.html.twig', [
             'activeCompetitions' => $activeCompetitions,
             'invitationCount' => $count,
-        ]);
-    }
-
-    #[Route('/supadmin_dashboard', name: 'app_super_admin_dashboard')]
-    public function adminDashboard(): Response
-    {
-        // Check if user is logged in
-        if (!$this->getUser()) {
-            $this->addFlash('error', 'Tu dois être connecté pour accéder à cette page');
-            return $this->redirectToRoute('app_login');
-        }
-
-        // Check if user has admin role - if not, show friendly message
-        if (!$this->isGranted('ROLE_SUPERADMIN')) {
-            $this->addFlash('error', 'Tu n\'as pas les permissions pour accéder à cette page');
-            return $this->redirectToRoute('app_dashboard');
-        }
-
-        // Get current user with proper type declaration
-        /** @var User $currentUser */
-        $currentUser = $this->getUser();
-
-        // Get all users except the current admin using repository method
-        $users = $this->userRepository->findAllExceptUser($currentUser);
-
-        // Get additional dashboard data
-        $unverifiedUsers = $this->userRepository->findUnverifiedUsers();
-        $userStats = $this->userRepository->getUserStatistics();
-
-        return $this->render('super_admin/dashboard.html.twig', [
-            'users' => $users,
-            'currentUser' => $currentUser,
-            'unverifiedUsers' => $unverifiedUsers,
-            'userStats' => $userStats
         ]);
     }
 }

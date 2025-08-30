@@ -246,7 +246,13 @@
 			padding: 0;
 			justify-content: center;
 			transition: all 0.3s ease;
+			text-decoration: none;
+            color: inherit; /* Prevents link color styling */
 		}
+
+		.sidebar-header {
+            text-decoration: none; /* Ensures no underline on hover */
+        }
 
 		.sidebar-logo {
 			font-size: 24px;
@@ -341,10 +347,15 @@
 		}
 
 		.user-profile {
-			display: flex;
-			align-items: center;
-		}
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: inherit; /* Prevents link color styling */
+        }
 
+        .user-profile:hover {
+            text-decoration: none; /* Ensures no underline on hover */
+        }
 		.user-avatar {
 			width: 40px;
 			height: 40px;
@@ -494,25 +505,76 @@
 		}
 
 		/* =================================
-		   VERIFICATION BANNER
-		   ================================= */
-		.verification-banner {
-			background: #d60707ff;
-			color: white;
-			padding: 1rem 1.5rem;
-			border-radius: 15px;
-			margin-bottom: 2rem;
-			display: flex;
-			align-items: center;
-			gap: 1rem;
-			box-shadow: var(--shadow-neon-red);
-			max-width: 100%;
-			box-sizing: border-box;
-		}
-
-		.verification-banner .icon {
-			font-size: 1.5rem;
-		}
+           VERIFICATION BANNER
+        ================================= */
+        .verification-banner {
+            background: #d60707; /* red banner */
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-neon-red);
+            flex-wrap: wrap;
+            box-sizing: border-box;
+            gap: 1rem;
+        }
+        
+        .banner-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .verification-banner .icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .banner-text {
+            flex: 1;
+        }
+        
+        .banner-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        
+        /* Button style */
+        .resend-btn {
+            background: #ffffff; /* white button */
+            color: #d60707;      /* match banner red */
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            padding: 0.5rem 1.2rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .resend-btn:hover:enabled {
+            background: #ffe3e3; /* light red hover */
+            color: #a00000;
+            border-color: #ffe3e3;
+        }
+        
+        .resend-btn:disabled {
+            background: #f0f0f0;
+            color: #999;
+            border-color: #ddd;
+            cursor: not-allowed;
+        }
+        
+        .countdown {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
 
 		/* =================================
 		   WELCOME SECTION
@@ -728,6 +790,20 @@
 		}
 
 		@media (max-width: 768px) {
+			.verification-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        
+            .banner-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        
+            .resend-btn, .countdown {
+                flex: 1;
+            }
+
 			.dashboard-container {
 				flex-direction: column;
 			}
@@ -838,13 +914,15 @@
 	<div class="dashboard-container">
 		<!-- Sidebar -->
 		<div class="sidebar">
-			<div class="sidebar-header">
-				<span class="sidebar-logo"><img src="\images\MIA_Logo.png" class="sidebar-img"/></span>
-				<span class="sidebar-title">INNOMIATE</span>
+			<div>
+				<a href="{{ path('app_dashboard') }}" class="sidebar-header" onclick="window.location=this.href; return false;">
+				    <span class="sidebar-logo"><img src="\images\MIA_Logo.png" class="sidebar-img"/></span>
+				    <span class="sidebar-title">INNOMIATE</span>
+				</a>
 			</div>
 			<ul class="nav-menu">
 				<li class="nav-item">
-					<a href="#" class="nav-link active" title="Tableau de bord">
+					<a href="{{ path('app_dashboard') }}" class="nav-link active" title="Tableau de bord" onclick="window.location=this.href; return false;">
 						<span class="nav-icon">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 								<path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
@@ -855,7 +933,7 @@
 					</a>
 				</li>
 				<li class="nav-item">
-					<a href="#" class="nav-link" title="Mon profil">
+					<a href="{{ path('app_profil') }}" class="nav-link" title="Mon profil" onclick="window.location=this.href; return false;">
 						<span class="nav-icon">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 								<path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
@@ -865,7 +943,7 @@
 					</a>
 				</li>
 				<li class="nav-item">
-					<a href="#" class="nav-link" title="Mes invitations">
+					<a href="{{ path('team_invitations')}}" class="nav-link" title="Mes invitations" onclick="window.location=this.href; return false;">
 						<span class="nav-icon">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 								<path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
@@ -876,7 +954,7 @@
 					</a>
 				</li>
 				<li class="nav-item">
-					<a href="#" class="nav-link" title="Tableau des pitchs">
+					<a href="{{ path('app_pitches') }}" class="nav-link" title="Tableau des pitchs" onclick="window.location=this.href; return false;">
 						<span class="nav-icon">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 								<path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clip-rule="evenodd" />
@@ -885,8 +963,20 @@
 						<span class="nav-text">Tableau des pitchs</span>
 					</a>
 				</li>
-				<li class="nav-item" style="margin-top: 30px;">
-					<a href="{{ path('app_logout') }}" class="nav-link" title="Déconnexion">
+
+				<li class="nav-item">
+					<a href="{{ path('support') }}" class="nav-link" title="Aide" onclick="window.location=this.href; return false;">
+						<span class="nav-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                            </svg>
+						</span>
+						<span class="nav-text">Aide</span>
+					</a>
+				</li>
+
+				<li class="nav-item" style="margin-top: 50px;">
+					<a href="{{ path('app_logout') }}" class="nav-link" title="Déconnexion" onclick="window.location=this.href; return false;">
 						<span class="nav-icon">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 								<path fill-rule="evenodd" d="M7.5 3.75A1.5 1.5 0 006 5.25v13.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5V15a.75.75 0 011.5 0v3.75a3 3 0 01-3 3h-6a3 3 0 01-3-3V5.25a3 3 0 013-3h6a3 3 0 013 3V9A.75.75 0 0115 9V5.25a1.5 1.5 0 00-1.5-1.5h-6zm5.03 4.72a.75.75 0 010 1.06l-1.72 1.72h10.94a.75.75 0 010 1.5H10.81l1.72 1.72a.75.75 0 11-1.06 1.06l-3-3a.75.75 0 010-1.06l3-3a.75.75 0 011.06 0z" clip-rule="evenodd" />
@@ -938,20 +1028,26 @@
 			{# Email Verification Banner (show only if user is not verified) #}
 			{% if app.user and not app.user.isVerified %}
 				<div class="verification-banner">
-					<span class="icon">📧</span>
-					<div>
-						<strong>Veuillez vérifier votre adresse e-mail</strong><br>
-						Consultez votre boîte de réception et cliquez sur le lien de vérification pour débloquer toutes les fonctionnalités.
-					</div>
+					<div class="banner-left">
+                        <span class="icon">📧</span>
+                        <div class="banner-text">
+                            <strong>Veuillez vérifier votre adresse e-mail</strong><br>
+                            Consultez votre boîte de réception et cliquez sur le lien de vérification pour débloquer toutes les fonctionnalités.
+                        </div>
+                    </div>
+                    <div class="banner-right">
+                        <button id="resend-btn" class="resend-btn">Renvoyer</button>
+                        <span id="countdown" class="countdown"></span>
+                    </div>
 				</div>
 			{% endif %}
 
 			<div class="page-header">
 				<h1 class="page-title">Dashboard</h1>
-				<div class="user-profile">
-					<div class="user-avatar">{{ app.user.firstName|first|upper }}</div>
-					<span class="user-name">{{ app.user.firstName|title }}</span>
-				</div>
+				    <a href="{{ path('app_profil') }}" class="user-profile" onclick="window.location=this.href; return false;">
+					    <div class="user-avatar">{{ app.user.firstName|first|upper }}</div>
+					    <span class="user-name">{{ app.user.firstName|title }}</span>
+					</a>
 			</div>
 
 			<div class="glass-card welcome-card">
@@ -974,7 +1070,7 @@
 							<p class="competition-desc">{{ competition.description }}</p>
 							<div class="competition-actions">
 								<a href="{{ competition.moreInfoLink }}" class="btn btn-outline" target="_blank">En savoir plus</a>
-								<a href="{{ path('app_participant') }}" class="btn btn-green">S'inscrire</a>
+								<a href="{{ path('inscription') }}" class="btn btn-green" onclick="window.location=this.href; return false;">S'inscrire</a>
 							</div>
 						</div>
 					{% endfor %}
@@ -988,8 +1084,8 @@
 		</div>
 	</div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
-	<script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js" defer></script>
+	<script defer>
 		// Dark Mode Toggle Functionality
 		const themeToggle = document.getElementById('darkModeToggle');
 		const sunIcon = themeToggle.querySelector('.sun-icon');
@@ -1213,5 +1309,176 @@
 				});
 			});
 		});
+
+		//resnd email button
+		document.addEventListener("DOMContentLoaded", () => {
+            const resendBtn = document.getElementById("resend-btn");
+            const countdownEl = document.getElementById("countdown");
+        
+            if (!resendBtn) return;
+        
+            let clickCount = parseInt(localStorage.getItem("resendClicks") || "0", 10);
+            const cooldown = 30; // 5 minutes in seconds
+            let timer;
+        
+            // Restore cooldown end time if it exists
+            let cooldownEnd = parseInt(localStorage.getItem("cooldownEnd") || "0", 10);
+            const now = Math.floor(Date.now() / 1000);
+        
+            // If still in cooldown → start countdown
+            if (cooldownEnd > now) {
+                startCountdown(cooldownEnd - now);
+            } else if (clickCount >= 3) {
+                removeButton();
+            } else {
+                resendBtn.disabled = true; // start disabled until first countdown ends
+                startCountdown(cooldown);
+            }
+        
+            function formatTime(seconds) {
+                const m = Math.floor(seconds / 60);
+                const s = seconds % 60;
+                return `(${m}:${s.toString().padStart(2, "0")})`;
+            }
+        
+            function startCountdown(duration) {
+                let remaining = duration;
+                resendBtn.disabled = true;
+                countdownEl.textContent = formatTime(remaining);
+        
+                // Save when this cooldown ends
+                cooldownEnd = Math.floor(Date.now() / 1000) + remaining;
+                localStorage.setItem("cooldownEnd", cooldownEnd);
+        
+                timer = setInterval(() => {
+                    const now = Math.floor(Date.now() / 1000);
+                    remaining = cooldownEnd - now;
+                    countdownEl.textContent = formatTime(remaining);
+        
+                    if (remaining <= 0) {
+                        clearInterval(timer);
+                        resendBtn.disabled = false;
+                        countdownEl.textContent = "";
+                        localStorage.removeItem("cooldownEnd");
+                    }
+                }, 1000);
+            }
+        
+            function removeButton() {
+                resendBtn.remove();
+                countdownEl.remove();
+                localStorage.removeItem("cooldownEnd");
+                localStorage.setItem("resendClicks", "3");
+            }
+        
+            // Function to create and display toast messages
+            function showToast(message, type = 'info') {
+                const flashContainer = document.querySelector('.flash-messages');
+                
+                // Create the toast element
+                const toast = document.createElement('div');
+                toast.className = `flash-${type}`;
+                
+                // Choose appropriate icon based on type
+                const icons = {
+                    'info': 'ℹ️',
+                    'success': '✅',
+                    'error': '❌',
+                    'warning': '⚠️'
+                };
+                
+                toast.innerHTML = `
+                    <span class="icon">${icons[type] || icons.info}</span>
+                    ${message}
+                    <button type="button" class="flash-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                
+                // Add entrance animation
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                
+                // Insert at the top of flash container
+                flashContainer.insertBefore(toast, flashContainer.firstChild);
+                
+                // Trigger entrance animation
+                requestAnimationFrame(() => {
+                    toast.style.transition = 'all 0.3s ease';
+                    toast.style.opacity = '1';
+                    toast.style.transform = 'translateY(0)';
+                });
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        toast.style.opacity = '0';
+                        toast.style.transform = 'translateY(-10px)';
+                        setTimeout(() => toast.remove(), 500);
+                    }
+                }, 5000);
+            }
+
+			// Updated resend button click handler with CSRF token
+            resendBtn.addEventListener("click", () => {
+                clickCount++;
+                localStorage.setItem("resendClicks", clickCount);
+            
+                // Get CSRF token and URL
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                const resendUrl = window.resendVerificationUrl || "{{ path('app_resend_verification') }}";
+                
+                // Prepare form data with CSRF token
+                const formData = new FormData();
+                if (csrfToken) {
+                    formData.append('_token', csrfToken);
+                }
+            
+                // Send AJAX request
+                fetch(resendUrl, {
+                    method: "POST",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    const contentType = response.headers.get('content-type') || '';
+                    
+                    if (contentType.includes('application/json')) {
+                        return response.json().then(data => ({
+                            ok: response.ok,
+                            status: response.status,
+                            data: data
+                        }));
+                    } else {
+                        return response.text().then(html => {
+                            console.error('Server returned HTML instead of JSON:', html.substring(0, 500));
+                            throw new Error('Erreur serveur - vérifiez la console pour plus de détails');
+                        });
+                    }
+                })
+                .then(result => {
+                    const { ok, status, data } = result;
+                    
+                    if (ok && data.success) {
+                        showToast(data.message, 'success');
+                    } else {
+                        showToast(data.message || 'Une erreur est survenue', 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error("AJAX error:", err);
+                    showToast('Erreur de connexion. Veuillez réessayer.', 'error');
+                });
+            
+                if (clickCount >= 3) {
+                    removeButton();
+                } else {
+                    startCountdown(cooldown);
+                }
+            });
+		});
 	</script>
+	<meta name="csrf-token" content="{{ csrf_token('resend_verification') }}">
+	<script defer>window.resendVerificationUrl = "{{ path('app_resend_verification') }}";</script>
 {% endblock %}

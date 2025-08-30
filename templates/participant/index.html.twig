@@ -1,592 +1,1527 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Devenir Participant{% endblock %}
-
 {% block body %}
 <style>
+/* Variables CSS pour la cohérence */
+:root {
+  --primary-red: #dc2626;
+  --primary-green: #059669;
+  --dark-red: #b91c1c;
+  --dark-green: #047857;
+  --light-gray: #f8fafc;
+  --medium-gray: #64748b;
+  --dark-gray: #1e293b;
+  --border-color: #e2e8f0;
+  --error-color: #dc2626;
+  --error-bg: #fef2f2;
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --gradient-red-green: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--gradient-red-green);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* Layout principal */
 .main {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-green) 100%);
-    min-height: 100vh;
-    font-family: 'Montserrat', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px 20px;
 }
 
-h1, h2 {
-    color: #075c22; /* Slightly darker green for better contrast */
-    margin-bottom: 24px;
-    font-weight: 700;
-    letter-spacing: -0.6px;
-    text-align: center;
-    text-transform: uppercase;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+.container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-.form-section {
-    background-color: #ffffffcc; /* Slight transparency for subtle glass effect */
-    border-radius: 14px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-    padding: 40px 30px;
-    margin: 0 auto 48px auto;
-    width: 100%;
-    max-width: 900px;
-    transition: box-shadow 0.4s ease, transform 0.4s ease;
-    border: 1px solid #d1d9de;
+/* Messages d'alerte */
+.alert {
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+  font-weight: 500;
 }
 
-.form-section:hover {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    transform: translateY(-6px);
+.alert-error {
+  background: var(--error-bg);
+  color: var(--error-color);
+  border-left-color: var(--error-color);
 }
 
-.glass-card {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(12px);
-    border-radius: 14px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-    padding: 2rem;
+.alert-warning {
+  background: #fef3cd;
+  color: #856404;
+  border-left-color: #ffeaa7;
 }
 
-.glass-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+.alert-success {
+  background: #f0fdf4;
+  color: #166534;
+  border-left-color: var(--primary-green);
 }
 
+/* Barre de progrès */
+.progress-container {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.progress-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.progress-title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.progress-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.progress-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.step-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: var(--transition-smooth);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.step-circle.active {
+  background: white;
+  color: var(--primary-green);
+  border-color: white;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.step-circle.completed {
+  background: var(--primary-green);
+  color: white;
+  border-color: var(--primary-green);
+}
+
+.step-label {
+  margin-top: 0.5rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  transition: var(--transition-smooth);
+}
+
+.step-label.active {
+  color: white;
+  font-weight: 600;
+}
+
+.progress-line {
+  position: absolute;
+  top: 25px;
+  left: 50px;
+  right: 50px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, white, var(--primary-green));
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Container des étapes */
+.step-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.step-form {
+  background: white;
+  border-radius: 20px;
+  box-shadow: var(--shadow-large);
+  padding: 3rem;
+  transition: var(--transition-smooth);
+  opacity: 1;
+  transform: translateX(0);
+  position: relative;
+}
+
+.step-form.hidden {
+  opacity: 0;
+  transform: translateX(-100%);
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.step-form.slide-in-right {
+  opacity: 0;
+  transform: translateX(100%);
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+.step-form.slide-out-left {
+  animation: slideOutLeft 0.6s ease-out forwards;
+}
+
+@keyframes slideInRight {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutLeft {
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+/* Titres des étapes */
+.step-title {
+  color: var(--dark-gray);
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+}
+
+.step-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: var(--gradient-red-green);
+  border-radius: 2px;
+}
+
+/* Groupes de formulaire */
+.form-group-spaced {
+  margin-bottom: 1.75rem;
+}
+
+/* Labels avec étoile rouge obligatoire */
 .form-label {
-    font-weight: 600;
-    color: #222;
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-    letter-spacing: 0.6px;
-    user-select: none;
+  display: block;
+  font-weight: 600;
+  color: #222222 !important;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  position: relative;
 }
 
+.form-label.required::before {
+  content: '* ';
+  color: var(--error-color);
+  font-weight: 700;
+  margin-right: 2px;
+}
+
+/* Labels pour boutons de fichier (doivent rester visibles) */
+.btn-upload {
+  color: white !important;
+}
+
+/* Champs de formulaire */
 .form-control {
-    height: 48px;
-    font-size: 1rem;
-    border: 1.8px solid #b0bbc4;
-    border-radius: 8px;
-    padding: 12px 18px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    background-color: #fafafa;
-    color: #111;
-    font-weight: 500;
-    outline-offset: 2px;
+  width: 100%;
+  height: 50px;
+  padding: 0 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 1rem;
+  color: var(--dark-gray);
+  background: #ffffff;
+  transition: var(--transition-smooth);
+  font-weight: 500;
 }
 
 .form-control:focus {
-    border-color: #075c22;
-    box-shadow: 0 0 6px rgba(7, 92, 34, 0.4);
-    background-color: #fff;
-    outline: none;
+  outline: none;
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+  transform: translateY(-1px);
 }
 
+.form-control::placeholder {
+  color: var(--medium-gray);
+  font-weight: 400;
+}
+
+/* États d'erreur */
+.form-control.error,
+.form-control:invalid {
+  border-color: var(--error-color) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+.form-control.error:focus,
+.form-control:invalid:focus {
+  border-color: var(--error-color) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important;
+}
+
+/* Messages d'erreur de champ */
+.field-error {
+  color: var(--error-color);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.field-error::before {
+  content: '⚠';
+  font-size: 0.9rem;
+}
+
+/* Select personnalisé */
 select.form-control {
-    color: #222 !important;
-    background-color: #fff !important;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23075622' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    background-size: 14px;
-    cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  cursor: pointer;
 }
 
-.btn {
-    font-size: 1.15rem;
-    padding: 14px 32px;
-    border-radius: 8px;
-    font-weight: 600;
-    letter-spacing: 0.7px;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-    cursor: pointer;
-}
-
-.btn-marathon {
-    background-color: #075c22;
-    color: #fff;
-    border: none;
-    box-shadow: 0 4px 12px rgba(7, 92, 34, 0.5);
-}
-
-.btn-marathon:hover,
-.btn-marathon:focus {
-    background-color: #054619;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(7, 92, 34, 0.7);
-    outline: none;
-}
-
-.btn-danger-marathon {
-    background-color: #b20817;
-    color: #fff;
-    border: none;
-    box-shadow: 0 4px 12px rgba(178, 8, 23, 0.5);
-}
-
-.btn-danger-marathon:hover,
-.btn-danger-marathon:focus {
-    background-color: #8e0614;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(178, 8, 23, 0.7);
-    outline: none;
+/* Upload de fichiers */
+.custom-file-upload {
+  position: relative;
+  margin-bottom: 1rem;
 }
 
 .btn-upload {
-    background-color: #075c22;
-    color: #fff;
-    padding: 12px 28px;
-    border-radius: 8px;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    font-size: 1rem;
-    box-shadow: 0 3px 10px rgba(7, 92, 34, 0.45);
-    user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--gradient-red-green);
+  color: white !important;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
 }
 
-.btn-upload:hover,
-.btn-upload:focus {
-    background-color: #054619;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 14px rgba(7, 92, 34, 0.65);
-    outline: none;
-}
-
-.btn-upload i {
-    margin-right: 10px;
-    font-size: 1.1rem;
-}
-
-.custom-file-upload {
-    margin-bottom: 22px;
+.btn-upload:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+  filter: brightness(1.1);
 }
 
 .file-name-display {
-    margin-left: 14px;
-    font-size: 0.95rem;
-    color: #444;
-    font-style: italic;
-    vertical-align: middle;
-    user-select: none;
+  margin-left: 16px;
+  font-size: 0.9rem;
+  color: var(--medium-gray);
+  font-style: italic;
+  vertical-align: middle;
 }
 
+.file-name-display.has-file {
+  color: var(--primary-green);
+  font-weight: 600;
+  font-style: normal;
+}
+
+.form-text {
+  font-size: 0.8rem;
+  color: var(--medium-gray);
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+/* Boutons de navigation */
+.step-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--border-color);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.btn-next {
+  background: var(--primary-green);
+  color: white;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-next:hover:not(:disabled) {
+  background: var(--dark-green);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-large);
+}
+
+.btn-prev {
+  background: transparent;
+  color: var(--medium-gray);
+  border: 2px solid var(--border-color);
+}
+
+.btn-prev:hover:not(:disabled) {
+  background: var(--light-gray);
+  border-color: var(--medium-gray);
+}
+
+.btn-submit {
+  background: var(--primary-red);
+  color: white;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: var(--dark-red);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-large);
+}
+
+/* Cards internes */
 .inner-card {
-    background-color: #f4f6f8;
-    border-radius: 10px;
-    border-left: 5px solid #075c22;
-    padding: 26px;
-    margin-bottom: 30px;
-    box-shadow: inset 0 0 6px rgba(7, 92, 34, 0.07);
+  background: linear-gradient(135deg, var(--light-gray) 0%, #ffffff 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-left: 5px solid var(--primary-green);
+  position: relative;
+  overflow: hidden;
 }
 
 .confirmation-section {
-    background-color: #f4f6f8;
-    border-radius: 10px;
-    padding: 26px;
-    margin-bottom: 30px;
-    border-left: 5px solid #075c22;
-    box-shadow: inset 0 0 6px rgba(7, 92, 34, 0.07);
+  background: linear-gradient(135deg, #fef7f0 0%, #ffffff 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-left: 5px solid var(--primary-red);
 }
 
 .confirmation-section p {
-    font-size: 1rem;
-    color: #333;
-    line-height: 1.6;
-    margin-bottom: 18px;
+  font-size: 0.95rem;
+  color: var(--dark-gray);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
 }
 
-.form-group-spaced {
-    margin-bottom: 1.8rem;
+/* Checkbox et radio styling */
+.form-check {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: var(--transition-smooth);
 }
 
-.text-end {
-    text-align: right;
+.form-check:hover {
+  background: rgba(5, 150, 105, 0.05);
 }
 
-/* Responsive */
+.form-check input[type="checkbox"],
+.form-check input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+  accent-color: var(--primary-green);
+  cursor: pointer;
+}
+
+.form-check label {
+  font-size: 0.9rem;
+  color: var(--dark-gray) !important;
+  cursor: pointer;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.confirmation-options {
+  margin-top: 1rem;
+}
+
+/* Layout responsive */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -12px;
+}
+
+.col-md-6 {
+  flex: 0 0 50%;
+  max-width: 50%;
+  padding: 0 12px;
+}
+
 @media (max-width: 768px) {
-    .main {
-        padding: 40px 15px;
-    }
-    .form-section {
-        padding: 25px 20px;
-    }
-    .btn {
-        padding: 12px 24px;
-        font-size: 1.05rem;
-    }
-    .btn-upload {
-        padding: 10px 22px;
-        font-size: 0.95rem;
-    }
+  .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  
+  .main {
+    padding: 20px 15px;
+  }
+  
+  .step-form {
+    padding: 2rem 1.5rem;
+  }
+  
+  .progress-container {
+    padding: 1.5rem;
+  }
+  
+  .step-title {
+    font-size: 1.5rem;
+  }
+  
+  .step-navigation {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
-/* Animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Animation d'erreur */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
-#step2-section {
-    animation: fadeIn 0.5s ease-out forwards;
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
+@keyframes slideOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+/* Loading states */
+.btn.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.btn.loading::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 </style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('🚀 Script de gestion des fichiers initialisé');
-// Masquer la deuxième carte initialement
-    const professionalSection = document.getElementById('professional-info-section');
-    if (professionalSection) {
-        professionalSection.style.display = 'none';
+    console.log('🚀 Multi-step form with validation initialized');
+    
+    // État des étapes
+    let currentStep = 1;
+    const totalSteps = 2;
+    
+    // Éléments DOM
+    const progressFill = document.querySelector('.progress-fill');
+    const stepCircles = document.querySelectorAll('.step-circle');
+    const stepLabels = document.querySelectorAll('.step-label');
+    const step1Form = document.getElementById('step1-form');
+    const step2Form = document.getElementById('step2-form');
+    const nextBtn = document.getElementById('next-btn');
+    
+    // Vérifier si on doit afficher l'étape 2 automatiquement
+    const showStep2 = window.showStep2 || false;
+    
+    console.log('🔍 Elements found:', {
+        step1Form: !!step1Form,
+        step2Form: !!step2Form,
+        nextBtn: !!nextBtn,
+        showStep2: showStep2
+    });
+    
+    // Initialisation
+    updateProgress();
+    
+    // Auto-afficher l'étape 2 si nécessaire
+    if (showStep2 && step2Form) {
+        console.log('🔄 Auto-switching to step 2');
+        setTimeout(() => {
+            goToStep(2);
+        }, 500);
     }
-    // Gestion du clic sur "Suivant"
-    const nextButton = document.querySelector('button[name="next_step"]');
-    if (nextButton) {
-        nextButton.addEventListener('click', function() {
-            // Stocker en session que l'étape 1 est validée
-            sessionStorage.setItem('step1_completed', 'true');
-        });
-        // Afficher la deuxième carte si l'étape 1 est déjà validée
-    if (sessionStorage.getItem('step1_completed') === 'true' && professionalSection) {
-        professionalSection.style.display = 'block';
-    }
-    }
-    // ✅ GESTION FICHIER 1 : Document d'identité
-    const inputFile1 = document.getElementById('{{ form.documentIdentite.vars.id }}');
-    const fileNameSpan1 = document.getElementById('file-name');
-    if (inputFile1 && fileNameSpan1) {
-        inputFile1.addEventListener('change', function () {
-            const file = inputFile1.files[0];
-            if (file) {
-                fileNameSpan1.textContent = file.name;
-                console.log('✅ Fichier 1 sélectionné:', file.name);
-            } else {
-                fileNameSpan1.textContent = "Aucun fichier sélectionné";
+    
+    // Validation en temps réel
+    initializeRealtimeValidation();
+    
+    // Gestion du bouton Suivant - SOUMISSION DIRECTE DU FORMULAIRE
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const form = step1Form.querySelector('form');
+            if (!form) return;
+            
+            if (!validateStep1Form(form)) {
+                console.log('Client-side validation failed');
+                return;
             }
+            
+            setButtonLoading(nextBtn, 'Traitement...');
+            
+            // Submit the form normally instead of using AJAX
+            form.submit();
         });
-        console.log('✅ Event listener fichier 1 ajouté');
     }
-    // ✅ GESTION FICHIER 2 : Carte Attestation
-    {% if specificForm is not null %}
-    const inputFile2 = document.getElementById('{{ specificForm.CarteAttestation.vars.id }}');
-    const fileNameSpan2 = document.getElementById('file-name-{{ specificForm.CarteAttestation.vars.id }}');
-    if (inputFile2 && fileNameSpan2) {
-        inputFile2.addEventListener('change', function () {
-            const file = inputFile2.files[0];
-            if (file) {
-                fileNameSpan2.textContent = file.name;
-                console.log('✅ Fichier 2 sélectionné:', file.name);
-            } else {
-                fileNameSpan2.textContent = "Aucun fichier sélectionné";
-            }
+    
+    // Validation stricte de l'étape 1
+    function validateStep1Form(form) {
+        let isValid = true;
+        let firstInvalidField = null;
+        
+        // Réinitialiser les styles d'erreur
+        form.querySelectorAll('.form-control').forEach(field => {
+            resetFieldError(field);
         });
-        console.log('✅ Event listener fichier 2 ajouté');
-    } else {
-        console.log('❌ Éléments fichier 2 non trouvés');
-    }
-    {% endif %}
-    // ✅ MÉTHODE UNIVERSELLE pour tous les futurs fichiers
-    document.querySelectorAll('input[type="file"]').forEach(function(input, index) {
-        input.addEventListener('change', function() {
-            const file = input.files[0];
-            const targetId = input.getAttribute('data-upload-target');
-            let fileNameSpan = null;
-            // Chercher le span correspondant
-            if (targetId) {
-                fileNameSpan = document.getElementById(targetId);
-            } else {
-                // Chercher le span suivant
-                fileNameSpan = input.closest('.custom-file-upload').querySelector('.file-name-display');
-            }
-            if (fileNameSpan) {
-                if (file) {
-                    fileNameSpan.textContent = file.name;
-                    console.log(✅ Fichier ${index + 1} sélectionné:, file.name);
-                } else {
-                    fileNameSpan.textContent = "Aucun fichier sélectionné";
+        
+        // Validation des champs texte obligatoires
+        const requiredTextFields = form.querySelectorAll('input[required]:not([type="file"]), select[required]');
+        
+        requiredTextFields.forEach(field => {
+            const value = field.value ? field.value.trim() : '';
+            
+            if (!value) {
+                isValid = false;
+                setFieldError(field, 'Ce champ est obligatoire');
+                
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+            } else if (field.type === 'email' && !isValidEmail(value)) {
+                isValid = false;
+                setFieldError(field, 'Format d\'email invalide');
+                
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
                 }
             }
         });
-    });
-});
-// Gestion du scroll vers l'étape 2
-document.addEventListener('DOMContentLoaded', function() {
-    // Vérifie si on vient de valider l'étape 1
-    {% if form.vars.submitted and form.vars.valid %}
-        scrollToStep2();
-    {% endif %}
-
-    // Gestion du clic sur "Suivant"
-    const nextButton = document.querySelector('button[name="next_step"]');
-    if (nextButton) {
-        nextButton.addEventListener('click', function() {
-            // Stocke en session que l'étape 1 est complète
-            sessionStorage.setItem('step1_completed', 'true');
-        });
-    }
-    function scrollToStep2() {
-        const step2Section = document.getElementById('step2-section');
-        if (step2Section) {
-            // Scroll en douceur avec décalage pour la barre de navigation
-            window.scrollTo({
-                top: step2Section.offsetTop - 100,
-                behavior: 'smooth'
-            });
+        
+        // Validation du fichier
+        const fileInput = form.querySelector('input[type="file"]');
+        if (fileInput && fileInput.hasAttribute('required') && !fileInput.files[0]) {
+            isValid = false;
+            showErrorMessage('Veuillez sélectionner un document d\'identité');
             
-            // Marquage visuel (optionnel)
-            step2Section.style.boxShadow = '0 0 0 2px #07702C';
+            // Highlight file upload area
+            const uploadLabel = form.querySelector('.btn-upload');
+            if (uploadLabel) {
+                uploadLabel.style.background = 'var(--error-color)';
+                setTimeout(() => {
+                    uploadLabel.style.background = 'var(--gradient-red-green)';
+                }, 3000);
+            }
+            
+            if (!firstInvalidField) {
+                firstInvalidField = fileInput;
+            }
+        }
+        
+        if (!isValid && firstInvalidField) {
+            // Focuser sur le premier champ invalide
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Animation d'erreur sur le formulaire
+            step1Form.style.animation = 'shake 0.5s ease-in-out';
             setTimeout(() => {
-                step2Section.style.boxShadow = 'none';
-            }, 2000);
+                step1Form.style.animation = '';
+            }, 500);
+        }
+        
+        return isValid;
+    }
+    
+    // Validation de l'étape 2
+    function validateStep2Form(form) {
+        let isValid = true;
+        let firstInvalidField = null;
+        
+        // Réinitialiser les styles d'erreur
+        form.querySelectorAll('.form-control').forEach(field => {
+            resetFieldError(field);
+        });
+        
+        // Validation des champs obligatoires
+        const requiredFields = form.querySelectorAll('input[required]:not([type="file"]), select[required], textarea[required]');
+        
+        requiredFields.forEach(field => {
+            const value = field.value ? field.value.trim() : '';
+            
+            if (!value) {
+                isValid = false;
+                setFieldError(field, 'Ce champ est obligatoire');
+                
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+            }
+        });
+        
+        // Validation des fichiers
+        const fileInputs = form.querySelectorAll('input[type="file"][required]');
+        fileInputs.forEach(input => {
+            if (!input.files[0]) {
+                isValid = false;
+                setFieldError(input, 'Ce fichier est obligatoire');
+                
+                if (!firstInvalidField) {
+                    firstInvalidField = input;
+                }
+            }
+        });
+        
+        // Validation des radios (partage)
+        const radioGroups = form.querySelectorAll('input[type="radio"][required]');
+        radioGroups.forEach(radio => {
+            const groupName = radio.name;
+            const isChecked = form.querySelector(`input[name="${groupName}"]:checked`);
+            
+            if (!isChecked) {
+                isValid = false;
+                const radioContainer = radio.closest('.confirmation-options');
+                if (radioContainer) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'field-error';
+                    errorDiv.textContent = 'Cette sélection est obligatoire';
+                    radioContainer.appendChild(errorDiv);
+                }
+            }
+        });
+        
+        if (!isValid && firstInvalidField) {
+            // Focuser sur le premier champ invalide
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Animation d'erreur sur le formulaire
+            step2Form.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                step2Form.style.animation = '';
+            }, 500);
+        }
+        
+        return isValid;
+    }
+    
+    // Validation d'email
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
+    // Définir une erreur sur un champ
+    function setFieldError(field, message) {
+        field.classList.add('error');
+        
+        // Supprimer l'ancien message d'erreur
+        const existingError = field.parentNode.querySelector('.field-error');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        // Ajouter le nouveau message d'erreur
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'field-error';
+        errorDiv.textContent = message;
+        field.parentNode.appendChild(errorDiv);
+    }
+    
+    // Réinitialiser l'erreur sur un champ
+    function resetFieldError(field) {
+        field.classList.remove('error');
+        const errorDiv = field.parentNode.querySelector('.field-error');
+        if (errorDiv) {
+            errorDiv.remove();
         }
     }
-});
-document.addEventListener('DOMContentLoaded', function() {
-    const inputFile = document.getElementById('{{ form.documentIdentite.vars.id }}');
-    const fileNameSpan = document.getElementById('file-name');
     
-    // Restaure le nom du fichier depuis la session au chargement
-    {% if session.get('document_uploaded') %}
-    fileNameSpan.textContent = '{{ session.get("document_uploaded")["original"] }}';
-    {% endif %}
+    // Validation en temps réel
+    function initializeRealtimeValidation() {
+        document.querySelectorAll('.form-control').forEach(field => {
+            field.addEventListener('blur', function() {
+                validateField(this);
+            });
+            
+            field.addEventListener('input', function() {
+                // Réinitialiser l'erreur lors de la saisie
+                if (this.classList.contains('error')) {
+                    resetFieldError(this);
+                }
+            });
+        });
+    }
     
-    // Gestion des nouveaux fichiers
-    if (inputFile) {
-        inputFile.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                fileNameSpan.textContent = this.files[0].name;
+    // Valider un champ individuel
+    function validateField(field) {
+        const value = field.value ? field.value.trim() : '';
+        
+        if (field.hasAttribute('required') && !value) {
+            setFieldError(field, 'Ce champ est obligatoire');
+            return false;
+        }
+        
+        if (field.type === 'email' && value && !isValidEmail(value)) {
+            setFieldError(field, 'Format d\'email invalide');
+            return false;
+        }
+        
+        resetFieldError(field);
+        return true;
+    }
+    
+    // Gestion des boutons de chargement
+    function setButtonLoading(button, text) {
+        button.disabled = true;
+        button.classList.add('loading');
+        button.innerHTML = `<span>${text}</span>`;
+    }
+    
+    function resetButtonLoading(button, text) {
+        button.disabled = false;
+        button.classList.remove('loading');
+        button.innerHTML = `${text} <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6v12z"/></svg>`;
+    }
+    
+    // Fonction pour afficher un message d'erreur
+    function showErrorMessage(message) {
+        // Supprimer les anciens messages
+        const existingAlerts = document.querySelectorAll('.temp-error-alert');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        // Créer le message d'erreur
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'temp-error-alert';
+        alertDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #dc2626;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            font-weight: 500;
+            max-width: 350px;
+            animation: slideInRight 0.3s ease-out;
+        `;
+        alertDiv.textContent = message;
+        
+        document.body.appendChild(alertDiv);
+        
+        // Supprimer automatiquement après 5 secondes
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }
+    
+    // Fonction pour changer d'étape
+    function goToStep(step) {
+        if (step < 1 || step > totalSteps) {
+            console.log('Invalid step:', step);
+            return;
+        }
+        
+        console.log(`🔄 Going to step: ${step} from step: ${currentStep}`);
+        
+        const previousStep = currentStep;
+        currentStep = step;
+        
+        if (!step1Form || !step2Form) {
+            console.error('❌ Forms not found!');
+            return;
+        }
+        
+        // Animation de transition
+        if (step > previousStep) {
+            // Aller vers l'avant
+            if (previousStep === 1 && step === 2) {
+                step1Form.classList.add('slide-out-left');
+                setTimeout(() => {
+                    step1Form.classList.add('hidden');
+                    step1Form.classList.remove('slide-out-left');
+                    
+                    step2Form.classList.remove('hidden');
+                    step2Form.classList.add('slide-in-right');
+                    
+                    setTimeout(() => {
+                        step2Form.classList.remove('slide-in-right');
+                    }, 600);
+                }, 300);
+            }
+        } else {
+            // Aller vers l'arrière
+            if (step === 1 && previousStep === 2) {
+                step2Form.classList.add('slide-out-left');
+                setTimeout(() => {
+                    step2Form.classList.add('hidden');
+                    step2Form.classList.remove('slide-out-left');
+                    
+                    step1Form.classList.remove('hidden');
+                    step1Form.classList.add('slide-in-right');
+                    
+                    setTimeout(() => {
+                        step1Form.classList.remove('slide-in-right');
+                    }, 600);
+                }, 300);
+            }
+        }
+        
+        updateProgress();
+    }
+    
+    // Mise à jour de la barre de progrès
+    function updateProgress() {
+        const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+        
+        setTimeout(() => {
+            if (progressFill) {
+                progressFill.style.width = progress + '%';
+            }
+        }, 100);
+        
+        stepCircles.forEach((circle, index) => {
+            const stepNumber = index + 1;
+            const label = stepLabels[index];
+            
+            circle.classList.remove('active', 'completed');
+            if (label) {
+                label.classList.remove('active');
+            }
+            
+            if (stepNumber < currentStep) {
+                circle.classList.add('completed');
+                circle.innerHTML = '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+            } else if (stepNumber === currentStep) {
+                circle.classList.add('active');
+                if (label) {
+                    label.classList.add('active');
+                }
+                circle.textContent = stepNumber;
             } else {
-                fileNameSpan.textContent = "{% if session.get('document_uploaded') %}{{ session.get('document_uploaded')['original'] }}{% else %}Aucun fichier sélectionné{% endif %}";
+                circle.textContent = stepNumber;
             }
         });
     }
+    
+    // Initialize file uploads on page load
+    initializeFileUploads();
+    
+    // Gestion avancée des fichiers
+    function initializeFileUploads() {
+        document.querySelectorAll('input[type="file"]').forEach(function(input) {
+            // Remove existing listeners to avoid duplicates
+            input.removeEventListener('change', handleFileChange);
+            input.addEventListener('change', handleFileChange);
+        });
+    }
+    
+    function handleFileChange(event) {
+        handleFileSelection(event.target);
+    }
+    
+    function handleFileSelection(input) {
+        const file = input.files[0];
+        let fileNameSpan = null;
+        
+        // Find the corresponding file display element
+        if (input.id.includes('documentIdentite')) {
+            fileNameSpan = document.getElementById('file-name');
+        } else {
+            const targetId = input.getAttribute('data-upload-target');
+            if (targetId) {
+                fileNameSpan = document.getElementById(targetId);
+            } else {
+                const container = input.closest('.custom-file-upload');
+                if (container) {
+                    fileNameSpan = container.querySelector('.file-name-display');
+                }
+            }
+        }
+        
+        if (fileNameSpan) {
+            if (file) {
+                // Complete file validation
+                const validation = validateFile(file);
+                
+                if (validation.isValid) {
+                    fileNameSpan.textContent = file.name;
+                    fileNameSpan.classList.add('has-file');
+                    
+                    // Reset errors
+                    const uploadLabel = input.closest('.custom-file-upload').querySelector('.btn-upload');
+                    if (uploadLabel) {
+                        uploadLabel.style.background = 'var(--gradient-red-green)';
+                    }
+                    
+                    // Clear field errors
+                    resetFieldError(input);
+                } else {
+                    showErrorMessage(validation.error);
+                    input.value = '';
+                    fileNameSpan.textContent = "Aucun fichier sélectionné";
+                    fileNameSpan.classList.remove('has-file');
+                    
+                    // Highlight error
+                    const uploadLabel = input.closest('.custom-file-upload').querySelector('.btn-upload');
+                    if (uploadLabel) {
+                        uploadLabel.style.background = 'var(--error-color)';
+                        setTimeout(() => {
+                            uploadLabel.style.background = 'var(--gradient-red-green)';
+                        }, 3000);
+                    }
+                    
+                    // Set field error
+                    setFieldError(input, validation.error);
+                }
+            } else {
+                fileNameSpan.textContent = "Aucun fichier sélectionné";
+                fileNameSpan.classList.remove('has-file');
+            }
+        }
+    }
+    
+    function validateFile(file) {
+        // Check file size (2MB max)
+        const maxSize = 2 * 1024 * 1024;
+        if (file.size > maxSize) {
+            return { isValid: false, error: 'Le fichier est trop volumineux (max 2MB)' };
+        }
+        
+        // Check file type
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        if (!allowedTypes.includes(file.type)) {
+            return { isValid: false, error: 'Format non autorisé. Utilisez PDF, JPG ou PNG.' };
+        }
+        
+        // Check extension
+        const allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+        const extension = file.name.split('.').pop().toLowerCase();
+        if (!allowedExtensions.includes(extension)) {
+            return { isValid: false, error: 'Extension non autorisée.' };
+        }
+        
+        return { isValid: true };
+    }
 });
+
+// Define global variable
+window.showStep2 = {{ showStep2|default(false) ? 'true' : 'false' }};
 </script>
 
 <div class="main">
-    <div class="container mt-4 mb-4">
-        {# Première carte - Informations Personnelles #}
-        <div class="form-section" id="step1-section">
-            <h1 class="text-center form-main-title" >INFORMATIONS PERSONNELLES</h1>
-            <div class="form-section glass-card p-4" style="max-width: 800px; margin: 0 auto; border: 1px solid #000; background: #fff;">
-                {{ form_start(form, { attr: { 'data-turbo': 'false' } }) }}
+    <div class="container">
+        {# Messages d'alerte - Show errors from both phases #}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label == 'error' ? 'error' : (label == 'warning' ? 'warning' : 'success') }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        {# Display form errors if any #}
+        {% if form is defined and form.vars.errors|length > 0 %}
+            <div class="alert alert-error">
+                <strong>Erreurs détectées :</strong>
+                <ul style="margin: 0.5rem 0 0 1.5rem;">
+                    {% for error in form.vars.errors %}
+                        <li>{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if specificForm is defined and specificForm is not null and specificForm.vars is defined and specificForm.vars.errors|length > 0 %}
+            <div class="alert alert-error">
+                <strong>Erreurs dans le formulaire professionnel :</strong>
+                <ul style="margin: 0.5rem 0 0 1.5rem;">
+                    {% for error in specificForm.vars.errors %}
+                        <li>{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {# Progress bar #}
+        <div class="progress-container">
+            <div class="progress-header">
+                <h1 class="progress-title">Inscription Participant</h1>
+                <p class="progress-subtitle">Complétez votre inscription en 2 étapes simples</p>
+            </div>
+            
+            <div class="progress-wrapper">
+                <div class="progress-step">
+                    <div class="step-circle {{ showStep2|default(false) ? 'completed' : 'active' }}">
+                        {% if showStep2|default(false) %}
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                        {% else %}
+                            1
+                        {% endif %}
+                    </div>
+                    <div class="step-label {{ showStep2|default(false) ? '' : 'active' }}">Informations<br>Personnelles</div>
+                </div>
+                <div class="progress-line">
+                    <div class="progress-fill" style="width: {{ showStep2|default(false) ? '100' : '0' }}%;"></div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-circle {{ showStep2|default(false) ? 'active' : '' }}">2</div>
+                    <div class="step-label {{ showStep2|default(false) ? 'active' : '' }}">Informations<br>Professionnelles</div>
+                </div>
+            </div>
+        </div>
+
+        {# Step container #}
+        <div class="step-container">
+            {# Step 1 - Personal Information #}
+            <div id="step1-form" class="step-form {{ showStep2|default(false) ? 'hidden' : '' }}">
+                <h2 class="step-title">Informations Personnelles</h2>
                 
-                {# Ligne Nom/Prénom #}
-                <div class="row mb-4">
-                    <div class="col-md-6 pe-md-3">
+                {{ form_start(form, { attr: { 'data-turbo': 'false', 'novalidate': 'novalidate' } }) }}
+                
+                {# Name/First name row #}
+                <div class="row">
+                    <div class="col-md-6">
                         <div class="form-group-spaced">
-                            {{ form_row(form.nom, {
+                            {{ form_label(form.nom, null, { 'label_attr': { 'class': 'form-label required' } }) }}
+                            {{ form_widget(form.nom, {
                                 'attr': {
-                                    'class': 'form-control',
+                                    'class': 'form-control' ~ (form.nom.vars.errors|length > 0 ? ' error' : ''),
                                     'placeholder': 'Votre nom',
-                                    'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
-                                },
-                                'label_attr': {
-                                    'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                                    'required': 'required'
                                 }
                             }) }}
+                            {% if form.nom.vars.errors|length > 0 %}
+                                <div class="field-error">{{ form.nom.vars.errors[0].message }}</div>
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-6 ps-md-3">
+                    <div class="col-md-6">
                         <div class="form-group-spaced">
-                            {{ form_row(form.prenom, {
+                            {{ form_label(form.prenom, null, { 'label_attr': { 'class': 'form-label required' } }) }}
+                            {{ form_widget(form.prenom, {
                                 'attr': {
-                                    'class': 'form-control',
+                                    'class': 'form-control' ~ (form.prenom.vars.errors|length > 0 ? ' error' : ''),
                                     'placeholder': 'Votre prénom',
-                                    'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
-                                },
-                                'label_attr': {
-                                    'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                                    'required': 'required'
                                 }
                             }) }}
+                            {% if form.prenom.vars.errors|length > 0 %}
+                                <div class="field-error">{{ form.prenom.vars.errors[0].message }}</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 
                 {# Email #}
-                <div class="form-group-spaced mb-4">
-                    {{ form_row(form.courrierProfessionnel, {
+                <div class="form-group-spaced">
+                    {{ form_label(form.courrierProfessionnel, null, { 'label_attr': { 'class': 'form-label required' } }) }}
+                    {{ form_widget(form.courrierProfessionnel, {
                         'attr': {
-                            'class': 'form-control',
+                            'class': 'form-control' ~ (form.courrierProfessionnel.vars.errors|length > 0 ? ' error' : ''),
                             'placeholder': 'exemple@email.com',
-                            'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
-                        },
-                        'label_attr': {
-                            'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                            'required': 'required',
+                            'type': 'email'
                         }
                     }) }}
+                    {% if form.courrierProfessionnel.vars.errors|length > 0 %}
+                        <div class="field-error">{{ form.courrierProfessionnel.vars.errors[0].message }}</div>
+                    {% endif %}
                 </div>
                 
-                {# Ligne Pays/Ville #}
-                <div class="row mb-4">
-                    <div class="col-md-6 pe-md-3">
+                {# Country/City row #}
+                <div class="row">
+                    <div class="col-md-6">
                         <div class="form-group-spaced">
-                            {{ form_row(form.pays, {
+                            {{ form_label(form.pays, null, { 'label_attr': { 'class': 'form-label required' } }) }}
+                            {{ form_widget(form.pays, {
                                 'attr': {
-                                    'class': 'form-control',
+                                    'class': 'form-control' ~ (form.pays.vars.errors|length > 0 ? ' error' : ''),
                                     'placeholder': 'Votre pays',
-                                    'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
-                                },
-                                'label_attr': {
-                                    'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                                    'required': 'required'
                                 }
                             }) }}
+                            {% if form.pays.vars.errors|length > 0 %}
+                                <div class="field-error">{{ form.pays.vars.errors[0].message }}</div>
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-6 ps-md-3">
+                    <div class="col-md-6">
                         <div class="form-group-spaced">
-                            {{ form_row(form.ville, {
+                            {{ form_label(form.ville, null, { 'label_attr': { 'class': 'form-label required' } }) }}
+                            {{ form_widget(form.ville, {
                                 'attr': {
-                                    'class': 'form-control',
+                                    'class': 'form-control' ~ (form.ville.vars.errors|length > 0 ? ' error' : ''),
                                     'placeholder': 'Votre ville',
-                                    'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
-                                },
-                                'label_attr': {
-                                    'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                                    'required': 'required'
                                 }
                             }) }}
+                            {% if form.ville.vars.errors|length > 0 %}
+                                <div class="field-error">{{ form.ville.vars.errors[0].message }}</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 
-                {# Document d'identité #}
-                <div class="form-group-spaced mb-4">
-    <div class="custom-file-upload">
-        {{ form_label(form.documentIdentite, null, {
-            'label_attr': {
-                'style': 'font-size: 1.1rem; font-weight: 500; color: #000; display: block; margin-bottom: 8px;'
-            }
-        }) }}
-        <label for="{{ form.documentIdentite.vars.id }}" class="btn btn-upload" style="display: inline-block;">
-            <i class="fas fa-cloud-upload-alt me-2"></i> Choisir un fichier
-            {{ form_widget(form.documentIdentite, {
-                'attr': {
-                    'style': 'display: none;'
-                }
-            }) }}
-        </label>
-        <span id="file-name" class="file-name-display" style="margin-left: 10px; font-size: 0.9rem; color: #000;">{% if session.get('document_uploaded') %}
-            {{ session.get('document_uploaded')['original'] }}
-        {% else %}
-            Aucun fichier sélectionné
-        {% endif %}</span>
-        <small class="form-text d-block mt-2" style="font-size: 0.9rem; color: #000;">Formats acceptés: PDF, JPG, PNG (max 2Mo)</small>
-    </div>
-</div>
-                
-                {# Profession #}
-                <div class="form-group-spaced mb-4">
-                    {{ form_row(form.profession, {
-                        'attr': {
-                            'class': 'form-control',
-                            'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
-                        },
-                        'label_attr': {
-                            'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
-                        }
-                    }) }}
-                </div>
-                
-                {# Bouton Suivant #}
-                <div class="text-end mt-4">
-                    <button type="submit" name="next_step" class="btn btn-marathon" style="font-size: 1.1rem; padding: 10px 25px; border: 1px solid #000; background-color: #07702C; color: white;">
-                        Suivant <i class="fas fa-arrow-right ms-2"></i>
-                    </button>
-                </div>
-                
-                {{ form_end(form) }}
-            </div>
-        </div>
-
-        {# Deuxième carte - Informations Professionnelles #}
-        {% if specificForm is not null %}
-        <div class="form-section mt-5" id="step2-section" >
-        {% if not (form.vars.submitted and form.vars.valid) %}style="display:none"{% endif %}
-            <h1 class="text-center form-main-titl">INFORMATIONS PROFESSIONNELLES</h1>
-            <div class="form-section glass-card p-4" style="max-width: 800px; margin: 0 auto; border: 1px solid #000; background: #fff;">
-                {{ form_start(specificForm, { attr: { 'data-turbo': 'false' } }) }}
-                
-                {# Carte interne #}
-                <div class="inner-card p-4 mb-4" style="background-color: #f8f9fa; border-radius: 5px; border-left: 4px solid #07702C;">
-                    {% for field in specificForm %}
-                        {% if field.vars.name != '_token' and field.vars.name != 'confirmation' %}
-                            <div class="form-group-spaced mb-4">
-                                {{ form_label(field, null, {
-                                    'label_attr': {
-                                        'style': 'font-size: 1.1rem; font-weight: 500; color: #000;'
+                {# Identity document #}
+                <div class="form-group-spaced">
+                    <div class="custom-file-upload">
+                        {{ form_label(form.documentIdentite, null, { 'label_attr': { 'class': 'form-label required' } }) }}
+                        <label for="{{ form.documentIdentite.vars.id }}" class="btn-upload">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14 2H6a2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8s0 0 0 0l-6-6zM18 20H6V4h7v5h5v11z"/>
+                            </svg>
+                            Choisir un fichier
+                            {{ form_widget(form.documentIdentite, {
+                                'attr': { 
+                                    'style': 'display: none;', 
+                                    'required': 'required',
+                                    'class': form.documentIdentite.vars.errors|length > 0 ? 'error' : ''
+                                }
+                            }) }}
+                        </label>
+                        <span id="file-name" class="file-name-display{% if form.documentIdentite.vars.data %} has-file{% endif %}">
+                            {% if form.documentIdentite.vars.data %}
+                                {{ form.documentIdentite.vars.data.clientOriginalName|default('Fichier sélectionné') }}
+                            {% else %}
+                                Aucun fichier sélectionné
+                            {% endif %}
+                        </span>
+                        <div class="form-text">Formats acceptés: PDF, JPG, PNG (max 2Mo)</div>
+                        {% if form.documentIdentite.vars.errors|length > 0 %}
+                            <div class="field-error">{{ form.documentIdentite.vars.errors[0].message }}</div>
+                            <script>
+                                // Highlight the file input if there's an error
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const uploadLabel = document.querySelector('label[for="{{ form.documentIdentite.vars.id }}"]');
+                                    if (uploadLabel) {
+                                        uploadLabel.style.background = 'var(--error-color)';
+                                        setTimeout(() => {
+                                            uploadLabel.style.background = 'var(--gradient-red-green)';
+                                        }, 3000);
                                     }
-                                }) }}
-                                
-                                {% if field.vars.block_prefixes.1 == 'choice' %}
-                                    {{ form_widget(field, {
-                                        'attr': {
-                                            'class': 'form-control',
-                                            'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
-                                        }
-                                    }) }}
-                                {% elseif field.vars.block_prefixes.1 == 'file' %}
-    <div class="custom-file-upload mb-4">
-       
-        <label for="{{  field.vars.id }}" class="btn btn-upload" >
-            <i class="fas fa-cloud-upload-alt me-2"></i> Choisir un fichier
-            {{ form_widget(field, {
-                'attr': {
-                    'style': 'display: none;',
-                    'data-upload-target': 'file-name-' ~ field.vars.id
-                }
-            }) }}
-        </label>
-        <span id="file-name-{{ field.vars.id }}"  class="file-name-display" style="margin-left: 10px; font-size: 0.9rem; color: #000;">Aucun fichier sélectionné</span>
-        <small class="form-text d-block mt-2" style="font-size: 0.9rem; color: #000;">Formats acceptés: PDF, JPG, PNG (max 2Mo)</small>
-    </div>
-                                {% else %}
-                                    {{ form_widget(field, {
-                                        'attr': {
-                                            'class': 'form-control',
-                                            'style': 'height: 45px; font-size: 1rem; border: 1px solid #000; color: #000; background: #fff;'
-                                        }
-                                    }) }}
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                
-                {# Section confirmation #}
-                {% if specificForm.confirmation is defined %}
-                <div class="confirmation-section p-3 mb-4" style="background-color: #f8f9fa; border-radius: 5px;">
-                    <p style="font-size: 1rem; color: #000; margin-bottom: 1rem;">
-                        Par la présente, je certifie l'exactitude des informations fournies et je consens à les partager avec le comité scientifique de l'événement à des fins organisationnelles conformément à la loi 09-08.
-                    </p>
-                    <div class="confirmation-options">
-                        {{ form_widget(specificForm.confirmation, {
-                            'attr': {
-                                'style': 'display: flex; gap: 20px; color: #000;'
+                                });
+                            </script>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {# Profession #}
+                    <div class="form-group-spaced">
+                        {{ form_label(form.profession, null, { 'label_attr': { 'class': 'form-label required' } }) }}
+                        {{ form_widget(form.profession, {
+                            'attr': { 
+                                'class': 'form-control' ~ (form.profession.vars.errors|length > 0 ? ' error' : ''),
+                                'required': 'required'
                             }
                         }) }}
+                        {% if form.profession.vars.errors|length > 0 %}
+                            <div class="field-error">{{ form.profession.vars.errors[0].message }}</div>
+                        {% endif %}
                     </div>
+                    
+                    {# Navigation #}
+                    <div class="step-navigation">
+                        <div></div>
+                        <button type="submit" id="next-btn" class="btn btn-next">
+                            Suivant 
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 18l6-6-6-6v12z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    {{ form_end(form) }}
                 </div>
-                {% endif %}
-                
-                {# Bouton Terminer #}
-                <div class="text-end mt-4">
-                    <button type="submit" class="btn btn-danger-marathon" style="font-size: 1.1rem; padding: 10px 25px; border: 1px solid #000; background-color: #B60817; color: white;">
-                        Terminer
-                    </button>
+
+                {# Step 2 - Professional Information #}
+                <div id="step2-form" class="step-form {{ showStep2|default(false) ? '' : 'hidden' }}">
+                    <h2 class="step-title">Informations Professionnelles</h2>
+                                    
+                    {% if specificForm is defined and specificForm %}
+                        {{ form_start(specificForm, { attr: { 'data-turbo': 'false', 'novalidate': 'novalidate' } }) }}
+                        
+                        <div class="inner-card">
+                            {% for field in specificForm %}
+                                {% if field.vars.name != '_token' and field.vars.name != 'partage' %}
+                                    <div class="form-group-spaced">
+                                        {# Determine if field is required #}
+                                        {% set isRequired = field.vars.required|default(false) %}
+                                        {% set hasErrors = field.vars.errors|length > 0 %}
+                                        
+                                        {{ form_label(field, null, { 
+                                            'label_attr': { 
+                                                'class': 'form-label' ~ (isRequired ? ' required' : '') 
+                                            } 
+                                        }) }}
+                                        
+                                        {% if field.vars.block_prefixes[1] is defined and field.vars.block_prefixes[1] == 'choice' %}
+                                            {% set choiceAttrs = {'class': 'form-control' ~ (hasErrors ? ' error' : '')} %}
+                                            {% if isRequired %}
+                                                {% set choiceAttrs = choiceAttrs|merge({'required': 'required'}) %}
+                                            {% endif %}
+                                            {{ form_widget(field, {'attr': choiceAttrs}) }}
+                                        {% elseif field.vars.block_prefixes[1] is defined and field.vars.block_prefixes[1] == 'file' %}
+                                            <div class="custom-file-upload">
+                                                <label for="{{ field.vars.id }}" class="btn-upload">
+                                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8s0 0 0 0l-6-6zM18 20H6V4h7v5h5v11z"/>
+                                                    </svg>
+                                                    Choisir un fichier
+                                                    {% set fileAttrs = {
+                                                        'style': 'display: none;', 
+                                                        'data-upload-target': 'file-name-' ~ field.vars.id,
+                                                        'class': hasErrors ? 'error' : ''
+                                                    } %}
+                                                    {% if isRequired %}
+                                                        {% set fileAttrs = fileAttrs|merge({'required': 'required'}) %}
+                                                    {% endif %}
+                                                    {{ form_widget(field, {'attr': fileAttrs}) }}
+                                                </label>
+                                                <span id="file-name-{{ field.vars.id }}" class="file-name-display{% if field.vars.data %} has-file{% endif %}">
+                                                    {% if field.vars.data %}
+                                                        {{ field.vars.data.clientOriginalName|default('Fichier sélectionné') }}
+                                                    {% else %}
+                                                        Aucun fichier sélectionné
+                                                    {% endif %}
+                                                </span>
+                                                <div class="form-text">Formats acceptés: PDF, JPG, PNG (max 2Mo)</div>
+                                                {% if hasErrors %}
+                                                    <div class="field-error">{{ field.vars.errors[0].message }}</div>
+                                                    <script>
+                                                        // Highlight the file input if there's an error
+                                                        document.addEventListener('DOMContentLoaded', function() {
+                                                            const uploadLabel = document.querySelector('label[for="{{ field.vars.id }}"]');
+                                                            if (uploadLabel) {
+                                                                uploadLabel.style.background = 'var(--error-color)';
+                                                                setTimeout(() => {
+                                                                    uploadLabel.style.background = 'var(--gradient-red-green)';
+                                                                }, 3000);
+                                                            }
+                                                        });
+                                                    </script>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            {% set textAttrs = {'class': 'form-control' ~ (hasErrors ? ' error' : '')} %}
+                                            {% if isRequired %}
+                                                {% set textAttrs = textAttrs|merge({'required': 'required'}) %}
+                                            {% endif %}
+                                            {{ form_widget(field, {'attr': textAttrs}) }}
+                                            {% if hasErrors %}
+                                                <div class="field-error">{{ field.vars.errors[0].message }}</div>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        
+                        {# Confirmation section #}
+                        {% if specificForm.partage is defined %}
+                        <div class="confirmation-section">
+                            <p>
+                                <span style="color: var(--error-color); font-weight: 700;">* </span>
+                                Par la présente, je certifie l'exactitude des informations fournies et je consens 
+                                à les partager avec le comité scientifique de l'événement à des fins organisationnelles 
+                                conformément à la loi 09-08.
+                            </p>
+                            <div class="confirmation-options">
+                                {% for choice in specificForm.partage %}
+                                    <div class="form-check">
+                                        {{ form_widget(choice, {'attr': {'required': 'required'}}) }}
+                                        {{ form_label(choice) }}
+                                    </div>
+                                {% endfor %}
+                                {% if specificForm.partage.vars.errors|length > 0 %}
+                                    <div class="field-error">{{ specificForm.partage.vars.errors[0].message }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {# Navigation #}
+                        <div class="step-navigation">
+                            <div></div>
+                            <button type="submit" class="btn btn-submit" id="submit-btn">
+                                Terminer 
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" fill="none"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        {{ form_end(specificForm) }}
+                    {% else %}
+                        {# Default form if specificForm doesn't exist #}
+                        <div class="inner-card">
+                            <div class="alert alert-warning" style="background: #fef3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                                <p style="margin: 0; color: #856404;">
+                                    <strong>Attention :</strong> Le formulaire spécifique n'est pas disponible. 
+                                    Veuillez contacter l'administrateur.
+                                </p>
+                            </div>
+                            
+                            <div class="form-group-spaced">
+                                <label class="form-label required">Informations complémentaires</label>
+                                <textarea class="form-control" rows="4" placeholder="Ajoutez vos informations professionnelles ici..." required></textarea>
+                            </div>
+                        </div>
+                        
+                        {# Navigation #}
+                        <div class="step-navigation">
+                            <div></div>
+                            <button type="button" class="btn btn-submit" onclick="alert('Formulaire non disponible')">
+                                Terminer 
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" fill="none"/>
+                                </svg>
+                            </button>
+                        </div>
+                    {% endif %}
                 </div>
-                
-                {{ form_end(specificForm) }}
             </div>
         </div>
-        {% endif %}
     </div>
 </div>
+
 {% endblock %}

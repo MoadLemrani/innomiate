@@ -10,7 +10,7 @@
         :root {
             --primary-red: #ff3e5f;
             --primary-green: #2ecc71;
-            --primary-accent: #e74c3c;
+            --primary-accent: #50e73cff;
             --primary-white: #ffffff;
             --dark-bg: #0f1621;
             --glass-bg: rgba(255, 255, 255, 0.05);
@@ -27,7 +27,7 @@
         :root[data-theme="light"] {
             --primary-red: #e74c3c;
             --primary-green: #27ae60;
-            --primary-accent: #c0392b;
+            --primary-accent: #2bc02bff;
             --primary-white: #000000;
             --dark-bg: #f8f9fa;
             --glass-bg: rgba(255, 255, 255, 0.9);
@@ -104,6 +104,17 @@
         @keyframes slideIn {
             from { opacity: 0; transform: translateX(20px); }
             to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes textShimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 0.7; }
+            50% { transform: translateY(-3px); opacity: 1; }
+            100% { transform: translateY(0); opacity: 0.7; }
         }
 
         /* =================================
@@ -287,7 +298,7 @@
         }
 
         .team-tab.active {
-            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-accent) 100%);
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-accent) 100%);
             color: white;
             font-weight: 600;
         }
@@ -302,67 +313,11 @@
         }
 
         /* =================================
-           FORM STYLES
+           FORM STYLES (KEPT FOR CONSISTENCY)
            ================================= */
         .form-group {
             margin-bottom: 1.5rem;
             animation: fadeIn 0.5s ease forwards;
-        }
-
-        .form-group:nth-child(1) { animation-delay: 0.1s; }
-        .form-group:nth-child(2) { animation-delay: 0.2s; }
-        .form-group:nth-child(3) { animation-delay: 0.3s; }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-light);
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 1rem;
-            color: var(--text-light);
-            transition: var(--transition);
-            box-sizing: border-box;
-        }
-
-        input::placeholder, textarea::placeholder {
-            color: var(--text-dim);
-            opacity: 0.7;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-red);
-            box-shadow: 0 0 0 3px rgba(255, 62, 95, 0.2);
-        }
-
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        /* Light theme form adjustments */
-        :root[data-theme="light"] input,
-        :root[data-theme="light"] textarea,
-        :root[data-theme="light"] select {
-            background: rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            color: var(--text-light);
-        }
-
-        :root[data-theme="light"] input:focus,
-        :root[data-theme="light"] textarea:focus,
-        :root[data-theme="light"] select:focus {
-            border-color: var(--primary-red);
-            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
         }
 
         /* =================================
@@ -371,7 +326,7 @@
         .btn {
             display: inline-block;
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-accent) 100%);
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-accent) 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -384,9 +339,9 @@
         }
 
         .btn:hover {
-            background: linear-gradient(135deg, #ff2847 0%, #c0392b 100%);
+            background: linear-gradient(135deg, #28ff5eff 0%, #4deb5aff 100%);
             transform: translateY(-2px);
-            box-shadow: var(--shadow-neon-red);
+            box-shadow: var(--shadow-neon-green);
             color: white;
             text-decoration: none;
         }
@@ -394,17 +349,6 @@
         .btn-block {
             display: block;
             width: 100%;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--primary-red);
-            color: var(--primary-red);
-        }
-
-        .btn-outline:hover {
-            background: rgba(255, 62, 95, 0.1);
-            box-shadow: none;
         }
 
         /* =================================
@@ -458,6 +402,137 @@
         }
 
         /* =================================
+           ENHANCED OPTION DESCRIPTIONS
+           ================================= */
+        .option-description {
+            margin-bottom: 2rem;
+            position: relative;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.08) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        :root[data-theme="light"] .option-description {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.05) 100%);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .option-description::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .option-description:hover::before {
+            left: 100%;
+        }
+
+        .option-description:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        :root[data-theme="light"] .option-description:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        .option-description p {
+            margin: 0;
+            line-height: 1.7;
+            font-size: 15px;
+            color: var(--text-light);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Special styling for key phrases */
+        .option-description .highlight {
+            position: relative;
+            font-weight: 600;
+            color: var(--primary-accent);
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-accent) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline;
+        }
+
+        .option-description .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-accent) 100%);
+            transition: width 0.3s ease;
+        }
+
+        .option-description:hover .highlight::after {
+            width: 100%;
+        }
+
+        /* Animated emphasis for strong text */
+        .option-description strong {
+            font-weight: 700;
+            color: var(--text-light);
+            position: relative;
+            animation: floatUp 2s ease-in-out infinite;
+            animation-delay: calc(var(--delay, 0) * 0.2s);
+        }
+
+        /* Create different delays for multiple strong elements */
+        .option-description strong:nth-of-type(1) { --delay: 0; }
+        .option-description strong:nth-of-type(2) { --delay: 1; }
+        .option-description strong:nth-of-type(3) { --delay: 2; }
+
+        /* Enhanced text with subtle glow effect */
+        .option-description .glow-text {
+            color: var(--primary-green);
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+            font-weight: 500;
+        }
+
+        /* Playful emoji-like decorations */
+        .option-description .emoji {
+            display: inline-block;
+            font-size: 1.2em;
+            margin: 0 2px;
+            animation: floatUp 1.5s ease-in-out infinite;
+            animation-delay: calc(var(--emoji-delay, 0) * 0.3s);
+        }
+
+        .option-description .emoji:nth-of-type(1) { --emoji-delay: 0; }
+        .option-description .emoji:nth-of-type(2) { --emoji-delay: 1; }
+        .option-description .emoji:nth-of-type(3) { --emoji-delay: 2; }
+
+        /* Tab-specific styling */
+        #create-tab .option-description {
+            border-left: 3px solid var(--primary-green);
+        }
+
+        #join-tab .option-description {
+            border-left: 3px solid var(--primary-accent);
+        }
+
+        #pitch-tab .option-description {
+            border-left: 3px solid #2cf14dff;
+        }
+
+        /* =================================
            RESPONSIVE ADJUSTMENTS
            ================================= */
         @media (max-width: 992px) {
@@ -478,6 +553,10 @@
 
             .team-form {
                 max-width: 100%;
+            }
+
+            .option-description {
+                padding: 1.25rem;
             }
         }
 
@@ -525,6 +604,14 @@
                 width: 20px;
                 height: 20px;
             }
+
+            .option-description {
+                padding: 1rem;
+            }
+
+            .option-description p {
+                font-size: 14px;
+            }
         }
     </style>
 
@@ -545,7 +632,7 @@
     <div class="team-container">
         <div class="team-illustration">
             <div class="team-illustration-content">
-                <h2>CRÉEZ OU REJOIGNEZ UNE ÉQUIPE</h2>
+                <h2>FAIRE PARTIE D'UNE ÉQUIPE</h2>
                 <p>Collaborez avec des talents complémentaires pour maximiser vos chances de succès dans la compétition.</p>
             </div>
         </div>
@@ -554,7 +641,7 @@
             <div class="team-form">
                 <div class="logo">
                     <span class="logo-icon">
-                        <img src="/images/MIA_Logo.png" alt="MIA Logo" />
+                        <a href="{{ path('app_dashboard') }}" onclick="window.location=this.href; return false;"><img src="/images/MIA_Logo.png" alt="MIA Logo" /></a>
                     </span>
                     <span class="logo-text">INNOMIATE</span>
                 </div>
@@ -579,83 +666,41 @@
 
                 <!-- Option 1: Créer une équipe -->
                 <div id="create-tab" class="tab-content active">
-                    <form method="POST" action="{{ path('team_create') }}">
-                        <div class="form-group">
-                            <label for="team-name">Nom de l'équipe</label>
-                            <input type="text" id="team-name" name="team[name]" placeholder="Donnez un nom à votre équipe" required>
-                            <p class="help-text">Ce nom sera visible par tous les participants</p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="member-codes">Codes des membres</label>
-                            <textarea id="member-codes" name="team[memberCodes]" placeholder="Entrez les codes participant de vos coéquipiers, séparés par des virgules"></textarea>
-                            <p class="help-text">Vous pouvez ajouter des membres. Chacun recevra une invitation.</p>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-block">Créer l'équipe</button>
-                    </form>
+                    <div class="option-description">
+                        <p><strong>Créez votre propre équipe</strong> et assumez le rôle de <span class="highlight">leader</span>. <span class="emoji">🚀</span><br>
+                        Donnez vie à votre <span class="glow-text">vision</span> en rassemblant des membres autour de votre projet, en définissant les <strong>objectifs</strong> et en guidant votre groupe vers la réussite. <span class="emoji">✨</span> Vous aurez la possibilité d'inviter d'autres participants à rejoindre votre équipe, de partager vos <span class="highlight">idées innovantes</span> et de collaborer pour relever ensemble les défis des compétitions.</p>
+                    </div>
+                    <a href="{{ path('team_create') }}" class="btn btn-block" onclick="window.location=this.href; return false;">Créer une équipe</a>
                 </div>
 
                 <!-- Option 2: Rejoindre une équipe -->
                 <div id="join-tab" class="tab-content">
-                    <form method="POST" action="{{ path('team_join') }}">
-                        <div class="form-group">
-                            <label for="team-id-input">Identifiant d'équipe</label>
-                            <input type="text" id="team-id-input" name="join_team[teamId]" placeholder="Entrez l'identifiant fourni par votre leader" required>
-                            <p class="help-text">Demandez cet identifiant au leader de l'équipe que vous souhaitez rejoindre</p>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-block">Envoyer la demande</button>
-                    </form>
+                    <div class="option-description">
+                        <p><strong>Rejoignez une équipe</strong> déjà formée en utilisant le <span class="highlight">code unique</span> que votre leader vous a communiqué. <span class="emoji">🤝</span><br>
+                        Intégrez un groupe <span class="glow-text">motivé</span>, partagez vos <strong>compétences uniques</strong> et collaborez avec vos coéquipiers pour atteindre vos objectifs communs. <span class="emoji">🎯</span> Ensemble, relevez les défis des compétitions et créez quelque chose d'<span class="highlight">extraordinaire</span>!</p>
+                    </div>
+                    <a href="{{ path('team_join') }}" class="btn btn-block" onclick="window.location=this.href; return false;">Rejoindre une équipe</a>
                 </div>
 
                 <!-- Option 3: Publier un pitch -->
                 <div id="pitch-tab" class="tab-content">
-                    <form method="POST" action="{{ path('team_pitch') }}">
-                        <div class="form-group">
-                            <label for="project-pitch">Votre pitch</label>
-                            <textarea id="project-pitch" name="pitch[description]" placeholder="Décrivez votre idée de projet (objectifs, technologies, besoins...)" required></textarea>
-                            <p class="help-text">Soyez convaincant ! Expliquez pourquoi votre projet est intéressant et quels talents vous recherchez.</p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="contact-info">Coordonnées</label>
-                            <input type="text" id="contact-info" name="pitch[contactInfo]" placeholder="Comment vous contacter ?" required>
-                            <p class="help-text">Email, lien LinkedIn, ou autre moyen de contact</p>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-block">Publier le pitch</button>
-                    </form>
+                    <div class="option-description">
+                        <p><strong>Partagez votre idée</strong> de projet et mettez-la en avant pour susciter l'intérêt de participants partageant votre <span class="highlight">vision</span>. <span class="emoji">💡</span><br>
+                        Décrivez votre <span class="glow-text">concept innovant</span>, vos objectifs ambitieux et le type de <strong>compétences</strong> que vous recherchez. <span class="emoji">🔍</span> Attirez des coéquipiers motivés, prêts à collaborer avec vous pour transformer votre idée en <span class="highlight">succès retentissant</span>!</p>
+                    </div>
+                    <a href="{{ path('team_pitch') }}" class="btn btn-block" onclick="window.location=this.href; return false;">Publier un pitch</a>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Tab Management
-        document.querySelectorAll('.team-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs and contents
-                document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                // Add active class to clicked tab
-                tab.classList.add('active');
-                
-                // Show corresponding content
-                const tabId = tab.getAttribute('data-tab');
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-            });
-        });
-
         // Theme Toggle Functionality
         const themeToggle = document.getElementById('darkModeToggle');
         const sunIcon = themeToggle.querySelector('.sun-icon');
         const moonIcon = themeToggle.querySelector('.moon-icon');
 
         function updateToggleIcons(isDark) {
-            // Show sun icon when in dark mode (to switch to light)
-            // Show moon icon when in light mode (to switch to dark)
             sunIcon.style.display = isDark ? 'flex' : 'none';
             moonIcon.style.display = isDark ? 'none' : 'flex';
         }
@@ -663,17 +708,11 @@
         function initializeTheme() {
             const savedTheme = localStorage.getItem('theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            // Prioritize saved theme, fallback to system preference
             const defaultTheme = savedTheme || (prefersDark ? 'dark' : 'light');
             
-            // Apply theme immediately to prevent flash
             document.documentElement.setAttribute('data-theme', defaultTheme);
-            
-            // Update toggle icons
             updateToggleIcons(defaultTheme === 'dark');
             
-            // Save the theme if it wasn't saved before
             if (!savedTheme) {
                 localStorage.setItem('theme', defaultTheme);
             }
@@ -692,21 +731,30 @@
         // Initialize everything when page loads
         document.addEventListener('DOMContentLoaded', function() {
             initializeTheme();
+            
+            // Tab management
+            document.querySelectorAll('.team-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
         });
 
-        // Theme toggle event listeners
         themeToggle.addEventListener('click', toggleTheme);
-        themeToggle.addEventListener('keydown', function (e) {
+        themeToggle.addEventListener('keydown', function(e) {
             if (e.key === ' ' || e.key === 'Enter') {
                 e.preventDefault();
                 toggleTheme();
             }
         });
 
-        // Listen for system theme changes
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-            const manuallySet = localStorage.getItem('theme-manually-set');
-            if (!manuallySet) {
+            if (!localStorage.getItem('theme-manually-set')) {
                 const newTheme = e.matches ? 'dark' : 'light';
                 document.documentElement.setAttribute('data-theme', newTheme);
                 localStorage.setItem('theme', newTheme);
