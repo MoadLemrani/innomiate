@@ -1,6 +1,6 @@
 # Innomiate
 
-Innomiate is a web platform that manages registration for AI hackathons (**Miathon**) organized by **MIA (Maison d’Intelligence Artificielle)**.  
+Innomiate is a web platform that manages registration for AI hackathons (.e.g: **Miathon**) organized by **MIA (Maison d’Intelligence Artificielle)**.  
 It streamlines participant registration, team formation, and competition management, reducing the organizational challenges of handling hackathons manually.
 
 ---
