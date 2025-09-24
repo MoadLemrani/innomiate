@@ -107,43 +107,148 @@ Future contributions may follow:
 
 ---
 
-##  
-Project Structure
------------------
-innomiate/
-├── assets/                # Front-end assets (JS, CSS, images)
-├── bin/                   # Symfony console commands
-├── config/                # Configuration files
-├── migrations/            # Database migrations
-├── public/                # Public web directory (front controller, public assets)
-├── src/                   # Main PHP source code
-│   ├── Controller/        # Controllers
-│   ├── Entity/            # Database entities
-│   ├── Enum/              # Enums
-│   ├── Form/              # Symfony forms
-│   ├── Kernel.php         # Symfony Kernel
-│   └── Repository/        # Doctrine repositories
-├── Security/              # Security-related classes
-├── templates/             # Twig templates
-│   ├── participant/
-│   ├── profil/
-│   ├── registration/
-│   ├── security/
-│   ├── super_admin/
-│   ├── team/
-│   └── base.html.twig
-├── tests/                 # PHPUnit tests
-├── translations/          # Translation files
-├── var/                   # Cache, logs, temporary files
-├── vendor/                # Composer dependencies
-├── .env                   # Environment variables
-├── .env.dev               # Development environment variables
-├── .gitignore             # Git ignore file
-├── compose.override.yaml  # Docker override (optional)
-├── compose.yaml           # Docker configuration (optional)
-├── composer.json          # Composer dependencies definition
-├── composer.lock          # Composer lock file
-├── importmap.php          # JS importmap configuration (optional)
-├── phpunit.xml            # PHPUnit configuration
-├── README.md              # Project documentation
-└── symfony.lock           # Symfony lock file
+## 🚀 Guide de Déploiement en Production
+
+Ce guide explique comment déployer **Innomiate** sur un serveur de production.
+
+---
+
+### 1. Prérequis Serveur
+- **PHP** : >= 8.1 avec extensions `ctype`, `iconv`, `pdo_mysql`
+- **Base de données** : MySQL 8.0+ ou MariaDB 10.5+
+- **Serveur Web** : Apache ou Nginx
+- **Composer** : v2.x
+
+---
+
+### 2. Récupération du code & installation
+```bash
+git clone https://github.com/MoadLemrani/innomiate.git
+cd innomiate
+composer install --no-dev --optimize-autoloader
+```
+
+---
+
+### 3. Variables d'environnement
+
+Créer un fichier `.env.local` :
+
+```env
+APP_ENV=prod
+APP_DEBUG=0
+
+# Base de données
+DATABASE_URL="mysql://DB_USER:DB_PASSWORD@127.0.0.1:3306/DB_NAME?serverVersion=8.0"
+
+# Mailer (pour vérification email)
+MAILER_DSN=smtp://USERNAME:PASSWORD@HOST:PORT
+
+# Google reCAPTCHA
+RECAPTCHA_SITE_KEY=your_site_key
+RECAPTCHA_SECRET_KEY=your_secret_key
+```
+
+---
+
+### 4. Base de données
+
+Exécuter les migrations :
+
+```bash
+php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+```
+
+---
+
+### 5. Optimisation Symfony
+
+```bash
+php bin/console cache:clear --env=prod
+php bin/console cache:warmup --env=prod
+```
+
+---
+
+### 6. Configuration Serveur Web
+
+#### 🔹 Exemple Nginx
+
+```nginx
+server {
+    server_name votre-domaine.com;
+    root /var/www/innomiate/public;
+
+    location / {
+        try_files $uri /index.php$is_args$args;
+    }
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+}
+```
+
+#### 🔹 Exemple Apache
+
+Activez les modules nécessaires :
+
+```bash
+a2enmod rewrite proxy_fcgi setenvif
+```
+
+VirtualHost :
+
+```apache
+<VirtualHost *:80>
+    ServerName votre-domaine.com
+    DocumentRoot /var/www/innomiate/public
+
+    <Directory /var/www/innomiate/public>
+        AllowOverride All
+        Order Allow,Deny
+        Allow from All
+
+        <IfModule mod_rewrite.c>
+            Options -MultiViews
+            RewriteEngine On
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteRule ^ index.php [QSA,L]
+        </IfModule>
+    </Directory>
+
+    <FilesMatch \.php$>
+        SetHandler "proxy:unix:/var/run/php/php8.1-fpm.sock|fcgi://localhost/"
+    </FilesMatch>
+</VirtualHost>
+```
+
+---
+
+### 7. Tâches en arrière-plan (Messenger/Emails)
+
+Si vous utilisez Messenger pour l'envoi d'emails :
+
+```bash
+php bin/console messenger:consume async -vv --env=prod
+```
+
+👉 À configurer comme service **systemd** ou via **Supervisor** pour rester actif.
+
+---
+
+### 8. Checklist Sécurité
+
+```bash
+# Vérifier les configurations critiques
+APP_DEBUG=0
+# Forcer HTTPS (Let's Encrypt conseillé)
+# Vérifier les permissions sur var/ et public/
+# Mettre à jour régulièrement les dépendances
+composer update --no-dev
+```
+
+---
+```
