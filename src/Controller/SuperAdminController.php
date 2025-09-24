@@ -311,7 +311,7 @@ final class SuperAdminController extends AbstractController
         if ($team->getMembers()->isEmpty()) {
             $team->setLeaderParticipant($participant);
         }
-        
+
         $em->flush();
 
         return $this->json(['success' => true, 'message' => 'Membre ajouté avec succès']);
@@ -329,12 +329,10 @@ final class SuperAdminController extends AbstractController
         ParticipantRepository $participantRepo,
         EntityManagerInterface $em
     ): JsonResponse {
-        // ✅ Auth check
         if (!$this->getUser()) {
             return $this->json(['success' => false, 'message' => 'Tu dois être connecté pour accéder à cette page'], 401);
         }
 
-        // ✅ Role check
         if (!$this->isGranted('ROLE_SUPERADMIN')) {
             return $this->json(['success' => false, 'message' => 'Tu n\'as pas les permissions pour accéder à cette page'], 403);
         }
@@ -350,7 +348,29 @@ final class SuperAdminController extends AbstractController
             return $this->json(['success' => false, 'message' => 'Ce participant n\'appartient pas à cette équipe'], 400);
         }
 
+        // ✅ Check if participant is the current leader
+        $isLeader = $team->getLeaderParticipant() && $team->getLeaderParticipant()->getId() === $participant->getId();
+
+        // ✅ Get remaining members BEFORE removing
+        $remainingMembers = $team->getMembers()->filter(fn($m) => $m->getId() !== $participant->getId());
+
+        // Detach participant
         $participant->setTeam(null);
+
+        // If leader, assign new leader if possible
+        if ($isLeader) {
+            if (!$remainingMembers->isEmpty()) {
+                $newLeader = $remainingMembers->first();
+                $team->setLeaderParticipant($newLeader);
+
+                if (method_exists($newLeader, 'setIsTeamLeader')) {
+                    $newLeader->setIsTeamLeader(true);
+                }
+            } else {
+                $team->setLeaderParticipant(null);
+            }
+        }
+
         $em->flush();
 
         return $this->json(['success' => true, 'message' => 'Membre supprimé avec succès']);
