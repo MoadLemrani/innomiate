@@ -573,9 +573,34 @@
 		border-color: var(--text-dim);
 	}
 
-	/* =================================
-	   RESPONSIVE DESIGN
-	   ================================= */
+	.separator {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+      color: var(--text-dim);
+      font-weight: bold;
+    }
+    
+    .separator::before,
+    .separator::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid #ccc;
+    }
+    
+    .separator:not(:empty)::before {
+      margin-right: 0.75em;
+    }
+    
+    .separator:not(:empty)::after {
+      margin-left: 0.75em;
+    }
+    
+    
+    /* =================================
+       RESPONSIVE DESIGN
+       ================================= */
 	@media(min-width: 768px) {
 		.auth-container {
 			flex-direction: row;
@@ -756,6 +781,8 @@
 						<span class="btn-text">Connexion</span>
 					</button>
 				</form>
+
+				<div class="separator"><span>OU</span></div>
 
 				<div class="auth-footer">
 					Vous n'avez pas de compte ?

@@ -83,14 +83,14 @@ class Participant
     #[ORM\Column(length: 10)]
     private ?string $partage = null;
 
-    // Collections for relationships
-    #[ORM\OneToMany(mappedBy: 'senderParticipant', targetEntity: Invitation::class)]
+    // Collections for relationships with cascade delete
+    #[ORM\OneToMany(mappedBy: 'senderParticipant', targetEntity: Invitation::class, cascade: ['remove'])]
     private Collection $sentInvitations;
 
-    #[ORM\OneToMany(mappedBy: 'receiverParticipant', targetEntity: Invitation::class)]
+    #[ORM\OneToMany(mappedBy: 'receiverParticipant', targetEntity: Invitation::class, cascade: ['remove'])]
     private Collection $receivedInvitations;
 
-    #[ORM\OneToMany(mappedBy: 'participant', targetEntity: Pitch::class)]
+    #[ORM\OneToMany(mappedBy: 'participant', targetEntity: Pitch::class, cascade: ['remove'])]
     private Collection $pitches;
 
     public function __construct()

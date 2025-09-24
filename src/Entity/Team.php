@@ -26,7 +26,7 @@ class Team
     private ?Competition $competition = null;
 
     #[ORM\ManyToOne(targetEntity: Participant::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'leader_participant_id', referencedColumnName: 'id', onDelete: 'SET NULL', nullable: true)]
     private ?Participant $leaderParticipant = null;
 
     // FIXED: Use datetime_immutable type for DateTimeImmutable objects
@@ -161,5 +161,28 @@ class Team
             }
         }
         return $this;
+    }
+
+    /**
+     * Auto-assign a new leader from existing members
+     */
+    public function autoAssignLeader(): void
+    {
+        if ($this->leaderParticipant === null && !$this->members->isEmpty()) {
+            // Get the first member as new leader
+            $newLeader = $this->members->first();
+            if ($newLeader instanceof Participant) {
+                $this->setLeaderParticipant($newLeader);
+                $newLeader->setIsTeamLeader(true);
+            }
+        }
+    }
+
+    /**
+     * Check if team has a leader
+     */
+    public function hasLeader(): bool
+    {
+        return $this->leaderParticipant !== null;
     }
 }

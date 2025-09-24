@@ -38,11 +38,11 @@ final class SuperAdminController extends AbstractController
 
         $rows = $user->findAll([], ['createdAt' => 'DESC']);
         $parts = $participant->findAll([], ['createdAt' => 'DESC']);
-        $superadmins = array_filter($rows, function($user) {
+        $superadmins = array_filter($rows, function ($user) {
             return in_array('ROLE_SUPERADMIN', $user->getRoles());
         });
         $teams = $teamRepository->findAll();
-        
+
         return $this->render('super_admin/dashboard.html.twig', [
             'controller_name' => 'AdminController',
             'rows' => $rows,
@@ -102,9 +102,9 @@ final class SuperAdminController extends AbstractController
 
     #[Route('/admin/{id}/modifier', name: 'modifier_participant', methods: ['POST'])]
     public function modifierParticipant(
-        Request $request, 
-        ParticipantRepository $participantRepository, 
-        EntityManagerInterface $em, 
+        Request $request,
+        ParticipantRepository $participantRepository,
+        EntityManagerInterface $em,
         int $id
     ): JsonResponse {
         // ✅ Auth check
@@ -134,7 +134,7 @@ final class SuperAdminController extends AbstractController
 
         // Vérifier que l'équipe existe avec ce code
         $team = $em->getRepository(\App\Entity\Team::class)
-                   ->findOneBy(['teamCode' => $teamCode]);
+            ->findOneBy(['teamCode' => $teamCode]);
 
         if (!$team) {
             return new JsonResponse(['success' => false, 'message' => 'Code d\'équipe introuvable']);
@@ -164,8 +164,11 @@ final class SuperAdminController extends AbstractController
     }
 
     #[Route('/admin/{id}/delete-participant', name: 'participant_delete')]
-    public function deleteParticipant(Participant $participant, EntityManagerInterface $em): RedirectResponse
-    {
+    public function deleteParticipant(
+        Participant $participant,
+        EntityManagerInterface $em,
+        TeamRepository $teamRepo
+    ): RedirectResponse {
         // ✅ Auth check
         if (!$this->getUser()) {
             $this->addFlash('error', 'Tu dois être connecté pour accéder à cette page');
@@ -178,13 +181,41 @@ final class SuperAdminController extends AbstractController
             return $this->redirectToRoute('app_dashboard');
         }
 
+        // Find teams where this participant is the leader
+        $teamsLed = $teamRepo->findBy(['leaderParticipant' => $participant]);
+
+        foreach ($teamsLed as $team) {
+            // Try to assign a new leader from the team's members (excluding the participant we delete)
+            $otherMembers = $team->getMembers()->filter(function ($m) use ($participant) {
+                return $m->getId() !== $participant->getId();
+            });
+
+            if (!$otherMembers->isEmpty()) {
+                $newLeader = $otherMembers->first();
+                if ($newLeader instanceof Participant) {
+                    $team->setLeaderParticipant($newLeader);
+
+                    // If you have an isTeamLeader flag on Participant, update it.
+                    if (method_exists($newLeader, 'setIsTeamLeader')) {
+                        $newLeader->setIsTeamLeader(true);
+                    }
+                } else {
+                    // fallback: clear leader
+                    $team->setLeaderParticipant(null);
+                }
+            } else {
+                // no other members => clear leader so FK won't block deletion
+                $team->setLeaderParticipant(null);
+            }
+        }
+
+        // Now safe to remove the participant
         $em->remove($participant);
         $em->flush();
 
         $this->addFlash('success', 'Participant supprimé avec succès');
         return $this->redirectToRoute('app_admin');
     }
-
     #[Route('/admin/get-team/{id}', name: 'get_team')]
     public function getTeam(TeamRepository $teamRepo, int $id): JsonResponse
     {
@@ -199,11 +230,11 @@ final class SuperAdminController extends AbstractController
         }
 
         $team = $teamRepo->find($id);
-        
+
         if (!$team) {
             return $this->json(['error' => 'Équipe introuvable'], 404);
         }
-        
+
         return $this->json([
             'id' => $team->getId(),
             'name' => $team->getName(),
@@ -214,7 +245,7 @@ final class SuperAdminController extends AbstractController
                 'prenom' => $team->getLeaderParticipant()->getPrenom(),
                 'nom' => $team->getLeaderParticipant()->getNom(),
                 'participantCode' => $team->getLeaderParticipant()->getParticipantCode(),
-                'email' => $team->getLeaderParticipant()->getCourrierProfessionnel(), 
+                'email' => $team->getLeaderParticipant()->getCourrierProfessionnel(),
             ] : null,
             'members' => array_map(fn($m) => [
                 'id' => $m->getId(),
@@ -276,6 +307,11 @@ final class SuperAdminController extends AbstractController
 
         // Association côté Participant (relation OneToMany/ManyToOne la plus courante)
         $participant->setTeam($team);
+
+        if ($team->getMembers()->isEmpty()) {
+            $team->setLeaderParticipant($participant);
+        }
+        
         $em->flush();
 
         return $this->json(['success' => true, 'message' => 'Membre ajouté avec succès']);

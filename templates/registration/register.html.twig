@@ -466,6 +466,30 @@
     :root[data-theme="light"] .theme-toggle {
         border-color: var(--text-dim);
     }
+
+    .separator {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+      color: var(--text-dim);
+      font-weight: bold;
+    }
+    
+    .separator::before,
+    .separator::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid #ccc;
+    }
+    
+    .separator:not(:empty)::before {
+      margin-right: 0.75em;
+    }
+    
+    .separator:not(:empty)::after {
+      margin-left: 0.75em;
+    }
     
     @media(max-width: 768px) {
         .auth-container {
@@ -649,7 +673,7 @@
 	              }
 	          }) }}
 					{{ form_widget(registrationForm.email, {
-	              'attr': {'class': 'form-control', 'placeholder': 'Adresse e-mail'}
+	              'attr': {'class': 'form-control', 'placeholder': 'exemple@exemple.com'}
 	          }) }}
 					{% if registrationForm.email.vars.errors|length > 0 %}
 						<ul class="flash-error">
@@ -671,7 +695,7 @@
 	          }) }}
 					<div class="password-input-wrapper">
 						{{ form_widget(registrationForm.plainPassword.first, {
-	              'attr': {'class': 'form-control', 'placeholder': 'Mot de passe'}
+	              'attr': {'class': 'form-control', 'placeholder': '••••••••••'}
 	          }) }}
 						<button type="button" class="password-toggle" aria-label="Toggle password visibility">
 							<svg class="eye-open" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -703,7 +727,7 @@
 	          }) }}
 					<div class="password-input-wrapper">
 						{{ form_widget(registrationForm.plainPassword.second, {
-	              'attr': {'class': 'form-control', 'placeholder': 'Confirmer le mot de passe'}
+	              'attr': {'class': 'form-control', 'placeholder': '••••••••••'}
 	          }) }}
 						<button type="button" class="password-toggle" aria-label="Toggle password confirmation visibility">
 							<svg class="eye-open" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -735,6 +759,8 @@
 				</button>
 
 				{{ form_end(registrationForm) }}
+
+                <div class="separator"><span>OU</span></div>
 
 				<div class="auth-footer" style="margin-top: 15px;">
 					Vous avez déjà un compte ?

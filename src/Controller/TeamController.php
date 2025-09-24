@@ -119,12 +119,12 @@ class TeamController extends AbstractController
         // 5. Form submission handling
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                /*
-                // Process member codes
+                
+                /*// Process member codes
                 $memberCodesRaw = $form->get('memberCodes')->getData() ?? '';
-                $codesArray = array_unique(preg_split('/[\s,]+/', trim($memberCodesRaw), -1, PREG_SPLIT_NO_EMPTY));
+                $codesArray = array_unique(preg_split('/[\s,]+/', trim($memberCodesRaw), -1, PREG_SPLIT_NO_EMPTY));*/
 
-                // Validate team size
+                /*// Validate team size
                 $maxAllowed = $competition->getMaxTeamSize() - 1;
                 if (count($codesArray) > $maxAllowed) {
                     $this->addFlash('error', "Maximum {$maxAllowed} membres autorisés");
@@ -137,8 +137,8 @@ class TeamController extends AbstractController
                 $team->setLeaderParticipant($participant)
                     ->setCreatedAt(new \DateTimeImmutable());
 
-                /*
-                // Process invitations
+                
+                /*// Process invitations
                 foreach ($codesArray as $code) {
                     if (!preg_match('/^#mia-[A-F0-9]{8}$/i', $code)) {
                         $this->addFlash('error', "Code invalide: {$code}");
@@ -186,6 +186,7 @@ class TeamController extends AbstractController
                 ]);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('team_create');
             }
         }
 
@@ -254,7 +255,7 @@ class TeamController extends AbstractController
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Votre demande a été envouyée avec succès !');
-            return $this->redirectToRoute('team_invitations');
+            return $this->redirectToRoute('team_join');
         }
 
         return $this->render('team/join.html.twig', [

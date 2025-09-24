@@ -43,7 +43,7 @@
             <!-- Onglet Tous les utilisateurs (Participants seulement) -->
             <div class="tab-content active" id="all-users">
                 <div class="section-header">
-                    <h2>Gestion des Utilisateurs (Participants uniquement)</h2>
+                    <h2>Gestion des Utilisateurs</h2>
                     <button class="export-btn" onclick="exportToExcel('all-users')">
                         📊 Exporter Excel
                     </button>
@@ -62,7 +62,7 @@
                         </thead>
                         <tbody id="users-tbody">
                             {% for p in rows %}
-                                {% if p.roles and 'ROLE_SUPERADMIN' not in p.roles %}
+                                {% if p.roles %}
                                 <tr>
                                     <td>{{p.email}}</td>
                                     <td>{{p.firstName}}</td>
