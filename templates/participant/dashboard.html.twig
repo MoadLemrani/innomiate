@@ -1310,15 +1310,14 @@
 			});
 		});
 
-		//resnd email button
-		document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", () => {
             const resendBtn = document.getElementById("resend-btn");
             const countdownEl = document.getElementById("countdown");
         
             if (!resendBtn) return;
         
             let clickCount = parseInt(localStorage.getItem("resendClicks") || "0", 10);
-            const cooldown = 30; // 5 minutes in seconds
+            const cooldown = 30; // 30 seconds
             let timer;
         
             // Restore cooldown end time if it exists
@@ -1331,8 +1330,11 @@
             } else if (clickCount >= 3) {
                 removeButton();
             } else {
-                resendBtn.disabled = true; // start disabled until first countdown ends
-                startCountdown(cooldown);
+                // Only enable the button, don't start countdown
+                resendBtn.disabled = false;
+                countdownEl.textContent = "";
+                // Clear any expired cooldown
+                localStorage.removeItem("cooldownEnd");
             }
         
             function formatTime(seconds) {
@@ -1417,12 +1419,12 @@
                     }
                 }, 5000);
             }
-
-			// Updated resend button click handler with CSRF token
+        
+            // Updated resend button click handler with CSRF token
             resendBtn.addEventListener("click", () => {
                 clickCount++;
                 localStorage.setItem("resendClicks", clickCount);
-            
+        
                 // Get CSRF token and URL
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
                 const resendUrl = window.resendVerificationUrl || "{{ path('app_resend_verification') }}";
@@ -1432,7 +1434,7 @@
                 if (csrfToken) {
                     formData.append('_token', csrfToken);
                 }
-            
+        
                 // Send AJAX request
                 fetch(resendUrl, {
                     method: "POST",
@@ -1470,14 +1472,14 @@
                     console.error("AJAX error:", err);
                     showToast('Erreur de connexion. Veuillez réessayer.', 'error');
                 });
-            
+        
                 if (clickCount >= 3) {
                     removeButton();
                 } else {
                     startCountdown(cooldown);
                 }
             });
-		});
+        });
 	</script>
 	<meta name="csrf-token" content="{{ csrf_token('resend_verification') }}">
 	<script defer>window.resendVerificationUrl = "{{ path('app_resend_verification') }}";</script>

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
@@ -109,21 +110,48 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/verify/email', name: 'app_verify_email')]
-    public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
-    {
-        try {
-            // Get user from the verification token instead of current session
-            $this->emailVerifier->handleEmailConfirmation($request, $this->getUser());
-        } catch (VerifyEmailExceptionInterface $exception) {
-            $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
+    public function verifyUserEmail(
+        Request $request,
+        TranslatorInterface $translator,
+        UserRepository $userRepository,
+        Security $security
+    ): Response {
+        // Try to get user ID from the verification URL
+        $userId = $request->query->get('id');
 
-            return $this->redirectToRoute('app_register');
+        if (!$userId) {
+            $this->addFlash('error', 'Lien de vérification invalide ou incomplet.');
+            return $this->redirectToRoute('app_login');
         }
 
-        $this->addFlash('success', 'Votre adresse e-mail a été vérifiée. Merci !');
+        // Find the user by ID
+        $user = $userRepository->find($userId);
 
-        // Redirect to dashboard
-        return $this->redirectToRoute('app_dashboard');
+        if (!$user) {
+            $this->addFlash('error', 'Utilisateur introuvable.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Automatically log in the user after registration
+        $security->login($user);
+
+        // Check if already verified
+        if ($user->isVerified()) {
+            $this->addFlash('info', 'Votre compte est déjà vérifié.');
+            return $this->redirectToRoute('app_dashboard');
+        }
+
+        try {
+            // Verify the email using the found user
+            $this->emailVerifier->handleEmailConfirmation($request, $user);
+            // Automatically log in the user after registration
+
+            $this->addFlash('success', 'Votre adresse e-mail a été vérifiée. Merci !');
+            return $this->redirectToRoute('app_dashboard');
+        } catch (VerifyEmailExceptionInterface $exception) {
+            $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
+            return $this->redirectToRoute('app_login');
+        }
     }
 
     #[Route('/verify/resend', name: 'app_resend_verification', methods: ['POST'])]

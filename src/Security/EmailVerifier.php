@@ -16,17 +16,15 @@ class EmailVerifier
         private VerifyEmailHelperInterface $verifyEmailHelper,
         private MailerInterface $mailer,
         private EntityManagerInterface $entityManager
-    ) {
-    }
+    ) {}
 
     public function sendEmailConfirmation(string $verifyEmailRouteName, User $user, TemplatedEmail $email): void
     {
-        /** @var User|null $user */
-        $user;
         $signatureComponents = $this->verifyEmailHelper->generateSignature(
             $verifyEmailRouteName,
             (string) $user->getId(),
             (string) $user->getEmail(),
+            ['id' => $user->getId()] // This adds the user ID to the URL
         );
 
         $context = $email->getContext();
@@ -42,10 +40,18 @@ class EmailVerifier
     /**
      * @throws VerifyEmailExceptionInterface
      */
-    public function handleEmailConfirmation(Request $request, User $user): void
+    public function handleEmailConfirmation(Request $request, ?User $user): void
     {
-        $this->verifyEmailHelper->validateEmailConfirmationFromRequest($request, (string) $user->getId(), (string) $user->getEmail());
-        /** @var User|null $user */
+        if (!$user) {
+            throw new \InvalidArgumentException('User cannot be null');
+        }
+
+        $this->verifyEmailHelper->validateEmailConfirmationFromRequest(
+            $request,
+            (string) $user->getId(),
+            (string) $user->getEmail()
+        );
+
         $user->setIsVerified(true);
 
         $this->entityManager->persist($user);
