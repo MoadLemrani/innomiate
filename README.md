@@ -62,19 +62,26 @@ Coding standards PSR-12.
 
 ## ⚙️ Installation & Setup (For next Developers)
 1. Clone the repo:
+```bash
    git clone https://github.com/MoadLemrani/innomiate.git
    cd innomiate
+```
 2. Install dependencies:
+```bash
    composer install
+```
 3. Configure environment variables:
    Database connection in .env
    Mailer for email verification
    reCAPTCHA API keys
 4. Run database migrations:
+```bash
    php bin/console doctrine:migrations:migrate
+```
 5. Start the development server:
+```bash
    symfony server:start
-
+```
 ---
 
 ## 🔒 Authentication & Verification
